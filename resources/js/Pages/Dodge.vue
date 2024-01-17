@@ -217,7 +217,7 @@ function checkCollision(sketch: P5): boolean {
 </script>
 
 <template>
-    <div class="absolute bottom-20 left-20 right-20 bg-red-500 bg-opacity-50 h-28 z-40" id="zone_joystick"></div>
+    <div class="absolute bottom-20 left-20 right-20 bg-red-500 bg-opacity-50 h-28 z-30" id="zone_joystick"></div>
 
   <div class="absolute top-4 right-4 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
@@ -233,7 +233,7 @@ function checkCollision(sketch: P5): boolean {
 
     </ul>
   </div>
-  <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center">
+  <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
     <div class="bg-white w-80 text-black py-20 flex flex-col justify-center items-center">
       <div v-if="asteroidCount === 0" class="text-center">
           <p>Keyboard? Use the WASD keys.</p>
