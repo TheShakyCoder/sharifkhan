@@ -28,7 +28,9 @@ const browser = {
 
 const asteroids = ref(<iAsteroid[]>[])
 const asteroidCount = ref(0)
-const maxAsteroids = 999
+const maxAsteroids = 99
+const frameRate = ref(40)
+const delta = ref(0)
 let me: iShip
 
 const playing = ref(false)
@@ -36,7 +38,7 @@ const playing = ref(false)
 new P5(( sketch: P5 ) => {
   sketch.setup = () => {
     sketch.createCanvas(browser.width, browser.height);
-    sketch.frameRate(40)
+    sketch.frameRate(frameRate.value)
 
     me = reactive<iShip>({
       position: sketch.createVector(arena.width / 2, arena.height / 2),
@@ -47,6 +49,7 @@ new P5(( sketch: P5 ) => {
     setInterval(createAsteroid, 1000, sketch)
   }
   sketch.draw = () => {
+    delta.value = parseInt(sketch.frameRate())
     sketch.background(100)
     sketch.push()
     sketch.translate(sketch.width / 2, sketch.height / 2)
@@ -165,11 +168,16 @@ function checkCollision(sketch: P5): boolean {
 <template>
   <div class="absolute top-4 right-4 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
-        <li><a href="/">Home</a></li>
+        <li><a class="underline" href="/">Home</a></li>
       <li class="flex">
-        <div class="w-16">Level</div>
-        <div class="text-right font-bold">{{ asteroidCount }}</div>
+        <div class="w-32">Level</div>
+        <div class="text-right font-bold w-16">{{ asteroidCount }}</div>
       </li>
+      <li class="flex">
+        <div class="w-32">Frame Rate</div>
+        <div class="text-right font-bold w-16">{{ delta }}</div>
+      </li>
+
     </ul>
   </div>
   <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center">
