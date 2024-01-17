@@ -1,7 +1,54 @@
 <script setup lang="ts">
 import P5 from 'p5'
-import {reactive, ref} from "vue";
-import {Link} from "@inertiajs/vue3";
+import {onMounted, reactive, ref} from "vue";
+
+import nipplejs from 'nipplejs';
+const joystick = ref(null)
+
+const joystickMovement = reactive({
+    x: 0,
+    y: 0
+})
+
+onMounted(() => {
+    joystick.value = nipplejs.create({
+        zone: document.getElementById('zone_joystick') as HTMLElement,
+        mode: 'semi',
+        restJoystick: true
+    });
+
+    joystick.value.on('move', function(evt, data) {
+        // console.log(data)
+        if(data.angle.radian > Math.PI / 8 && data.angle.radian < Math.PI * 3 / 8) {
+            joystickMovement.x = 1
+            joystickMovement.y = -1
+        } else if(data.angle.radian > Math.PI * 3 / 8 && data.angle.radian < Math.PI * 5 / 8) {
+            joystickMovement.x = 0
+            joystickMovement.y = -1
+        } else if(data.angle.radian > Math.PI * 5 / 8 && data.angle.radian < Math.PI * 7 / 8) {
+            joystickMovement.x = -1
+            joystickMovement.y = -1
+        } else if(data.angle.radian > Math.PI * 7 / 8 && data.angle.radian < Math.PI * 9 / 8) {
+            joystickMovement.x = -1
+            joystickMovement.y = 0
+        } else if(data.angle.radian > Math.PI * 9 / 8 && data.angle.radian < Math.PI * 11 / 8) {
+            joystickMovement.x = -1
+            joystickMovement.y = 1
+        } else if(data.angle.radian > Math.PI * 11 / 8 && data.angle.radian < Math.PI * 13 / 8) {
+            joystickMovement.x = 0
+            joystickMovement.y = 1
+        } else if(data.angle.radian > Math.PI * 13 / 8 && data.angle.radian < Math.PI * 15 / 8) {
+            joystickMovement.x = 1
+            joystickMovement.y = 1
+        } else if(data.angle.radian > Math.PI * 15 / 8 || data.angle.radian < Math.PI * 8) {
+            joystickMovement.x = 1
+            joystickMovement.y = 0
+        }
+    }).on('end', function (evt, data) {
+        joystickMovement.x = 0
+        joystickMovement.y = 0
+    });
+})
 
 interface iAsteroid {
   name: string,
@@ -31,6 +78,10 @@ const asteroidCount = ref(0)
 const maxAsteroids = 99
 const frameRate = ref(40)
 const delta = ref(0)
+
+const playerSpeed = 60
+const asteroidSpeed = 70
+
 let me: iShip
 
 const playing = ref(false)
@@ -61,7 +112,8 @@ new P5(( sketch: P5 ) => {
 
     //  ASTEROIDS
     asteroids.value.forEach((asteroid) => {
-      asteroid.position.add(asteroid.vector)
+        const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
+      asteroid.position.add(newVector)
       if(asteroid.position.x > arena.width) {
         asteroid.position.x = 0
       }
@@ -108,22 +160,21 @@ function end() {
 }
 
 function captureMovement(sketch: P5) {
-  const distance = 70
-  let movement = { x: 0, y: 0 }
+  let movement = {...joystickMovement}
   if (sketch.keyIsDown(65)) {
-    movement.x = -distance
+    movement.x = -1
   }
   if (sketch.keyIsDown(68)) {
-    movement.x = distance
+    movement.x = 1
   }
   if (sketch.keyIsDown(87)) {
-    movement.y = -distance
+    movement.y = -1
   }
   if (sketch.keyIsDown(83)) {
-    movement.y = distance
+    movement.y = 1
   }
 
-  const vector = sketch.createVector(movement.x * sketch.deltaTime / 1000, movement.y * sketch.deltaTime / 1000)
+  const vector = sketch.createVector(movement.x * sketch.deltaTime * playerSpeed / 1000, movement.y * sketch.deltaTime * playerSpeed / 1000)
   if(playing.value)
     me.position.add(vector)
 
@@ -142,7 +193,7 @@ function createAsteroid(sketch: P5): void {
   asteroids.value.push({
     name: asteroidCount.value.toString(),
     position: sketch.createVector(0, 0),
-    vector: sketch.createVector(sketch.random(-5, 5), sketch.random(-5, 5)),
+    vector: sketch.createVector(sketch.random(-asteroidSpeed, asteroidSpeed), sketch.random(-asteroidSpeed, asteroidSpeed)),
     radius: 25
   })
 }
@@ -166,6 +217,8 @@ function checkCollision(sketch: P5): boolean {
 </script>
 
 <template>
+    <div class="absolute bottom-20 left-20 right-20 bg-red-500 bg-opacity-50 h-28 z-40" id="zone_joystick"></div>
+
   <div class="absolute top-4 right-4 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
         <li><a class="underline" href="/">Home</a></li>
@@ -183,7 +236,8 @@ function checkCollision(sketch: P5): boolean {
   <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center">
     <div class="bg-white w-80 text-black py-20 flex flex-col justify-center items-center">
       <div v-if="asteroidCount === 0" class="text-center">
-          <p>Use the WASD keys.</p>
+          <p>Keyboard? Use the WASD keys.</p>
+          <p>Touchscreen? Use the red bar.</p>
           <p>Survive to level {{ maxAsteroids }}</p>
           <p>Muh ha ha ha!</p>
       </div>
