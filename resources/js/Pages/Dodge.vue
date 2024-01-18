@@ -154,8 +154,14 @@ new P5(( sketch: P5 ) => {
     })
 
     //  ME
-    sketch.fill(255)
+    sketch.fill(200)
+    sketch.noStroke()
     sketch.circle(me.position.x, me.position.y, me.radius * 2)
+    sketch.fill(0)
+    sketch.textSize(20)
+    sketch.textStyle(sketch.BOLD)
+    sketch.textAlign(sketch.CENTER, sketch.CENTER);
+    sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
 
     captureMovement(sketch)
     if(checkCollision(sketch))
@@ -236,7 +242,6 @@ function checkCollision(sketch: P5): boolean {
 
 <template>
   <div class="bottom-1 left-1 right-1 bg-red-500 bg-opacity-50 h-28 z-30" :class="[touchScreen ? 'absolute' : 'hidden']" id="zone_joystick"></div>
-
   <div class="absolute left-0 top-0 right-0 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
       <li class="flex">
