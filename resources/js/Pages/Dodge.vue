@@ -255,23 +255,33 @@ function checkCollision(sketch: P5): boolean {
 
     </ul>
   </div>
-  <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
-    <div class="bg-white bg-opacity-70 rounded-xl w-60 text-black py-12 flex flex-col justify-center items-center">
-      <div v-if="asteroidCount === 0" class="text-center">
+
+  <transition
+    enter-active-class="duration-150 ease-out"
+    enter-from-class="opacity-0 scale-95"
+    enter-to-class="opacity-100 scale-100"
+    leave-active-class="duration-150 ease-in"
+    leave-from-class="opacity-100 scale-100"
+    leave-to-class="opacity-0 scale-95"
+  >
+    <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
+      <div class="bg-white bg-opacity-70 rounded-xl w-60 text-black py-12 flex flex-col justify-center items-center">
+        <div v-if="asteroidCount === 0" class="text-center">
           <p v-if="touchScreen">Touch the red bar.</p>
           <p v-else>Use the WASD keys.</p>
           <p>Avoid the black balls.</p>
           <p>Survive to level {{ maxAsteroids }}.</p>
           <p>Muh ha ha ha!</p>
+        </div>
+        <div v-else>
+          <div class="text-center ">You got to level</div>
+          <div class="text-center text-7xl font-bold">{{ asteroidCount }}</div>
+        </div>
+        <button @click="start" class="my-4 p-4 px-5 rounded-2xl bg-green-600 text-white font-bold">Start</button>
+          <a class="underline" href="/">Home</a>
       </div>
-      <div v-else>
-        <div class="text-center ">You got to level</div>
-        <div class="text-center text-7xl font-bold">{{ asteroidCount }}</div>
-      </div>
-      <button @click="start" class="my-4 p-4 px-5 rounded-2xl bg-green-600 text-white font-bold">Start</button>
-        <a class="underline" href="/">Home</a>
     </div>
-  </div>
+  </transition>
 </template>
 
 <style scoped>
