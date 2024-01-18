@@ -235,7 +235,7 @@ function checkCollision(sketch: P5): boolean {
 </script>
 
 <template>
-    <div class="absolute bottom-0 left-0 right-0 bg-red-500 bg-opacity-50 h-28 z-30" id="zone_joystick"></div>
+    <div v-if="touchScreen" class="absolute bottom-0 left-0 right-0 bg-red-500 bg-opacity-50 h-28 z-30" id="zone_joystick"></div>
 
   <div class="absolute top-4 right-4 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
