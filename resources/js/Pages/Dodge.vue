@@ -235,11 +235,10 @@ function checkCollision(sketch: P5): boolean {
 </script>
 
 <template>
-    <div v-if="touchScreen" class="absolute bottom-0 left-0 right-0 bg-red-500 bg-opacity-50 h-28 z-30" id="zone_joystick"></div>
+  <div class="bottom-20 left-20 right-20 bg-red-500 bg-opacity-50 h-28 z-30" :class="[touchScreen ? 'absolute' : 'hidden']" id="zone_joystick"></div>
 
-  <div class="absolute top-4 right-4 z-20">
+  <div class="absolute left-0 top-0 right-0 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
-        <li><a class="underline" href="/">Home</a></li>
       <li class="flex">
         <div class="w-32">Level</div>
         <div class="text-right font-bold w-16">{{ asteroidCount }}</div>
@@ -252,7 +251,7 @@ function checkCollision(sketch: P5): boolean {
     </ul>
   </div>
   <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
-    <div class="bg-white bg-opacity-70 w-60 text-black py-12 flex flex-col justify-center items-center">
+    <div class="bg-white bg-opacity-70 rounded-xl w-60 text-black py-12 flex flex-col justify-center items-center">
       <div v-if="asteroidCount === 0" class="text-center">
           <p v-if="touchScreen">Touch the red bar.</p>
           <p v-else>Use the WASD keys.</p>
@@ -260,8 +259,12 @@ function checkCollision(sketch: P5): boolean {
           <p>Survive to level {{ maxAsteroids }}.</p>
           <p>Muh ha ha ha!</p>
       </div>
-      <div v-else>You got to level {{ asteroidCount }}</div>
-      <button @click="start" class="p-4 px-5 rounded-2xl bg-green-600 text-white font-bold">Start</button>
+      <div v-else>
+        <div class="text-center ">You got to level</div>
+        <div class="text-center text-7xl font-bold">{{ asteroidCount }}</div>
+      </div>
+      <button @click="start" class="my-4 p-4 px-5 rounded-2xl bg-green-600 text-white font-bold">Start</button>
+        <a class="underline" href="/">Home</a>
     </div>
   </div>
 </template>
