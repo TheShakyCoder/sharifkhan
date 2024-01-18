@@ -110,9 +110,20 @@ new P5(( sketch: P5 ) => {
     sketch.fill(55)
     sketch.rect(0, 0, arena.width, arena.height)
 
+    //  GRID
+    sketch.stroke(255)
+    sketch.strokeWeight(4)
+    for(let x = 100; x < arena.width; x = x + 100) {
+        for(let y = 100; y < arena.height; y = y + 100) {
+            sketch.point(x, y)
+        }
+    }
+
     //  ASTEROIDS
+    sketch.stroke(255)
+    sketch.strokeWeight(1)
     asteroids.value.forEach((asteroid) => {
-        const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
+      const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
       asteroid.position.add(newVector)
       if(asteroid.position.x > arena.width) {
         asteroid.position.x = 0
@@ -234,7 +245,7 @@ function checkCollision(sketch: P5): boolean {
     </ul>
   </div>
   <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
-    <div class="bg-white w-80 text-black py-20 flex flex-col justify-center items-center">
+    <div class="bg-white bg-opacity-70 w-60 text-black py-12 flex flex-col justify-center items-center">
       <div v-if="asteroidCount === 0" class="text-center">
           <p>Keyboard? Use the WASD keys.</p>
           <p>Touchscreen? Use the red bar.</p>
