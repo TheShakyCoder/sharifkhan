@@ -3,6 +3,7 @@ import P5 from 'p5'
 import {onMounted, reactive, ref} from "vue";
 
 import nipplejs from 'nipplejs';
+const touchScreen = ref(false)
 const joystick = ref(null)
 
 const joystickMovement = reactive({
@@ -11,6 +12,12 @@ const joystickMovement = reactive({
 })
 
 onMounted(() => {
+    if(window.matchMedia("(pointer: coarse)").matches) {
+        // touchscreen
+        console.log('TOUCH')
+        touchScreen.value = true
+    }
+
     joystick.value = nipplejs.create({
         zone: document.getElementById('zone_joystick') as HTMLElement,
         mode: 'semi',
@@ -228,7 +235,7 @@ function checkCollision(sketch: P5): boolean {
 </script>
 
 <template>
-    <div class="absolute bottom-20 left-20 right-20 bg-red-500 bg-opacity-50 h-28 z-30" id="zone_joystick"></div>
+    <div class="absolute bottom-0 left-0 right-0 bg-red-500 bg-opacity-50 h-28 z-30" id="zone_joystick"></div>
 
   <div class="absolute top-4 right-4 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
@@ -247,9 +254,10 @@ function checkCollision(sketch: P5): boolean {
   <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
     <div class="bg-white bg-opacity-70 w-60 text-black py-12 flex flex-col justify-center items-center">
       <div v-if="asteroidCount === 0" class="text-center">
-          <p>Keyboard? Use the WASD keys.</p>
-          <p>Touchscreen? Use the red bar.</p>
-          <p>Survive to level {{ maxAsteroids }}</p>
+          <p v-if="touchScreen">Touch the red bar.</p>
+          <p v-else>Use the WASD keys.</p>
+          <p>Avoid the black balls.</p>
+          <p>Survive to level {{ maxAsteroids }}.</p>
           <p>Muh ha ha ha!</p>
       </div>
       <div v-else>You got to level {{ asteroidCount }}</div>
