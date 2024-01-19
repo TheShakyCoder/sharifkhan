@@ -94,7 +94,7 @@ const ships = reactive({
         radius: 20,
         weaponRadius: 1
     },
-    laser: {
+    shield: {
         speed: 50,
         radius: 25,
         weaponRadius: 50
@@ -127,10 +127,9 @@ new P5(( sketch: P5 ) => {
     sketch.background(100)
     sketch.push()
     sketch.translate(sketch.width / 2, sketch.height / 2)
-      if(me) {
-
-    sketch.translate(-me.position.x, -me.position.y)
-      }
+    if(me) {
+      sketch.translate(-me.position.x, -me.position.y)
+    }
 
     //  ARENA
     sketch.fill(55)
@@ -167,34 +166,40 @@ new P5(( sketch: P5 ) => {
       sketch.fill(0)
       sketch.circle(asteroid.position.x, asteroid.position.y, asteroid.radius * 2)
       sketch.fill(255)
-      sketch.textSize(20)
+      sketch.textSize(18)
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
       sketch.text(asteroid.name, asteroid.position.x, asteroid.position.y)
     })
 
     if(me) {
         if(weaponCharged)
-            sketch.fill(0, 255, 0)
+            sketch.fill(0, 180, 0)
         else
             sketch.fill(255, 0, 0)
       sketch.noStroke()
       sketch.circle(me.position.x, me.position.y, me.radius * 2)
       //  weapon
       sketch.noFill()
-      sketch.stroke(255)
+        if(weaponCharged)
+            sketch.stroke(0, 180, 0)
+        else
+            sketch.stroke(255, 0, 0)
+
       sketch.strokeWeight(1)
       sketch.circle(me.position.x, me.position.y, me.weaponRadius * 2)
-      sketch.fill(0)
+      //  level text
+      sketch.fill(255)
       sketch.textSize(20)
       sketch.textStyle(sketch.BOLD)
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
-        sketch.noStroke()
+      sketch.noStroke()
       sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
+
       captureMovement(sketch)
       getDistances(sketch)
       const checkWeaponResult = checkWeapon()
       if(checkWeaponResult > -1 && weaponCharged)
-        laserAsteroid(checkWeaponResult)
+        laserAsteroid(sketch, checkWeaponResult)
       if(checkCollision())
         end()
     }
@@ -203,7 +208,7 @@ new P5(( sketch: P5 ) => {
   }
 })
 
-function laserAsteroid(asteroidIndex: number) {
+function laserAsteroid(sketch: P5, asteroidIndex: number) {
     asteroids.value.splice(asteroidIndex, 1)
     weaponCharged = false
     setTimeout(function () {
@@ -345,7 +350,7 @@ function getDistances(sketch: P5) {
         </div>
         <div class="w-full flex justify-around my-4">
           <button @click="start('dodge')" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Dodge</button>
-          <button @click="start('laser')" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Laser</button>
+          <button @click="start('shield')" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Shield</button>
         </div>
         <a class="underline" href="/">Home</a>
       </div>
