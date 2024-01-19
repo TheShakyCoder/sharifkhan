@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import P5 from 'p5'
-import {onMounted, reactive, ref} from "vue";
+import {onMounted, reactive, Ref, ref} from "vue";
 
 import nipplejs from 'nipplejs';
+
 const touchScreen = ref(false)
 const joystick = ref(null)
 
@@ -10,11 +11,11 @@ const joystickMovement = reactive({
     x: 0,
     y: 0
 })
+const nippleAngle: Ref<number | null> = ref(null)
 
 onMounted(() => {
     if(window.matchMedia("(pointer: coarse)").matches) {
         // touchscreen
-        console.log('TOUCH')
         touchScreen.value = true
     }
 
@@ -25,35 +26,9 @@ onMounted(() => {
     });
 
     joystick.value.on('move', function(evt, data) {
-        // console.log(data)
-        if(data.angle.radian > Math.PI / 8 && data.angle.radian < Math.PI * 3 / 8) {
-            joystickMovement.x = 1
-            joystickMovement.y = -1
-        } else if(data.angle.radian > Math.PI * 3 / 8 && data.angle.radian < Math.PI * 5 / 8) {
-            joystickMovement.x = 0
-            joystickMovement.y = -1
-        } else if(data.angle.radian > Math.PI * 5 / 8 && data.angle.radian < Math.PI * 7 / 8) {
-            joystickMovement.x = -1
-            joystickMovement.y = -1
-        } else if(data.angle.radian > Math.PI * 7 / 8 && data.angle.radian < Math.PI * 9 / 8) {
-            joystickMovement.x = -1
-            joystickMovement.y = 0
-        } else if(data.angle.radian > Math.PI * 9 / 8 && data.angle.radian < Math.PI * 11 / 8) {
-            joystickMovement.x = -1
-            joystickMovement.y = 1
-        } else if(data.angle.radian > Math.PI * 11 / 8 && data.angle.radian < Math.PI * 13 / 8) {
-            joystickMovement.x = 0
-            joystickMovement.y = 1
-        } else if(data.angle.radian > Math.PI * 13 / 8 && data.angle.radian < Math.PI * 15 / 8) {
-            joystickMovement.x = 1
-            joystickMovement.y = 1
-        } else if(data.angle.radian > Math.PI * 15 / 8 || data.angle.radian < Math.PI * 8) {
-            joystickMovement.x = 1
-            joystickMovement.y = 0
-        }
+        nippleAngle.value = data.angle.radian
     }).on('end', function (evt, data) {
-        joystickMovement.x = 0
-        joystickMovement.y = 0
+        nippleAngle.value = null
     });
 })
 
@@ -127,9 +102,11 @@ new P5(( sketch: P5 ) => {
     sketch.background(100)
     sketch.push()
     sketch.translate(sketch.width / 2, sketch.height / 2)
-    if(me) {
+    if(me)
       sketch.translate(-me.position.x, -me.position.y)
-    }
+    else
+      sketch.translate(-arena.width / 2, -arena.height / 2)
+
 
     //  ARENA
     sketch.fill(55)
@@ -240,6 +217,7 @@ function end() {
 
 function captureMovement(sketch: P5) {
   let movement = {...joystickMovement}
+    let  vector
   if (sketch.keyIsDown(65)) {
     movement.x = -1
   }
@@ -253,7 +231,14 @@ function captureMovement(sketch: P5) {
     movement.y = 1
   }
 
-  const vector = sketch.createVector(movement.x * sketch.deltaTime * ships[shipMode.value].speed / 1000, movement.y * sketch.deltaTime * ships[shipMode.value].speed / 1000)
+  if(nippleAngle.value)
+      vector = sketch.createVector(
+          sketch.cos(nippleAngle.value) * sketch.deltaTime * ships[shipMode.value].speed / 1000,
+          -sketch.sin(nippleAngle.value) * sketch.deltaTime * ships[shipMode.value].speed / 1000
+      )
+  else
+    vector = sketch.createVector(movement.x * sketch.deltaTime * ships[shipMode.value].speed / 1000, movement.y * sketch.deltaTime * ships[shipMode.value].speed / 1000)
+  
   if(playing.value)
     me.position.add(vector)
 
