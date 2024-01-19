@@ -61,13 +61,14 @@ interface iAsteroid {
   name: string,
   position: P5.Vector,
   vector: P5.Vector,
-  radius: number
+  radius: number,
 }
 
 interface iShip {
   position: P5.Vector,
   vector: P5.Vector,
-  radius: number
+  radius: number,
+  weaponRadius: number
 }
 
 const arena = {
@@ -86,8 +87,26 @@ const maxAsteroids = 99
 const frameRate = ref(40)
 const delta = ref(0)
 
-const playerSpeed = 60
+const shipMode = ref('dodge')
+const ships = reactive({
+    dodge: {
+        speed: 60,
+        radius: 20,
+        weaponRadius: 1
+    },
+    laser: {
+        speed: 50,
+        radius: 25,
+        weaponRadius: 50
+    }
+})
+
 const asteroidSpeed = 70
+const weaponChargeTime = 5000
+let weaponCharged = true
+
+let positionMiddle: P5.Vector
+let noVector: P5.Vector
 
 let me: iShip
 
@@ -98,11 +117,8 @@ new P5(( sketch: P5 ) => {
     sketch.createCanvas(browser.width, browser.height);
     sketch.frameRate(frameRate.value)
 
-    me = reactive<iShip>({
-      position: sketch.createVector(arena.width / 2, arena.height / 2),
-      vector: sketch.createVector(0, 0),
-      radius: 25
-    })
+      positionMiddle = sketch.createVector(arena.width / 2, arena.height / 2)
+      noVector = sketch.createVector(0, 0)
 
     setInterval(createAsteroid, 1000, sketch)
   }
@@ -111,7 +127,10 @@ new P5(( sketch: P5 ) => {
     sketch.background(100)
     sketch.push()
     sketch.translate(sketch.width / 2, sketch.height / 2)
+      if(me) {
+
     sketch.translate(-me.position.x, -me.position.y)
+      }
 
     //  ARENA
     sketch.fill(55)
@@ -129,7 +148,7 @@ new P5(( sketch: P5 ) => {
     //  ASTEROIDS
     sketch.stroke(255)
     sketch.strokeWeight(1)
-    asteroids.value.forEach((asteroid) => {
+    asteroids.value.forEach((asteroid : iAsteroid) => {
       const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
       asteroid.position.add(newVector)
       if(asteroid.position.x > arena.width) {
@@ -153,29 +172,60 @@ new P5(( sketch: P5 ) => {
       sketch.text(asteroid.name, asteroid.position.x, asteroid.position.y)
     })
 
-    //  ME
-    sketch.fill(200)
-    sketch.noStroke()
-    sketch.circle(me.position.x, me.position.y, me.radius * 2)
-    sketch.fill(0)
-    sketch.textSize(20)
-    sketch.textStyle(sketch.BOLD)
-    sketch.textAlign(sketch.CENTER, sketch.CENTER);
-    sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
-
-    captureMovement(sketch)
-    if(checkCollision(sketch))
-      end()
+    if(me) {
+        if(weaponCharged)
+            sketch.fill(0, 255, 0)
+        else
+            sketch.fill(255, 0, 0)
+      sketch.noStroke()
+      sketch.circle(me.position.x, me.position.y, me.radius * 2)
+      //  weapon
+      sketch.noFill()
+      sketch.stroke(255)
+      sketch.strokeWeight(1)
+      sketch.circle(me.position.x, me.position.y, me.weaponRadius * 2)
+      sketch.fill(0)
+      sketch.textSize(20)
+      sketch.textStyle(sketch.BOLD)
+      sketch.textAlign(sketch.CENTER, sketch.CENTER);
+        sketch.noStroke()
+      sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
+      captureMovement(sketch)
+      getDistances(sketch)
+      const checkWeaponResult = checkWeapon()
+      if(checkWeaponResult > -1 && weaponCharged)
+        laserAsteroid(checkWeaponResult)
+      if(checkCollision())
+        end()
+    }
 
     sketch.pop()
   }
 })
 
-function start() {
+function laserAsteroid(asteroidIndex: number) {
+    asteroids.value.splice(asteroidIndex, 1)
+    weaponCharged = false
+    setTimeout(function () {
+        weaponCharged = true
+    }, weaponChargeTime)
+}
+
+function start(mode: string) {
+  shipMode.value = mode
   asteroidCount.value = 0
   asteroids.value = []
-  me.position.x = 400
-  me.position.y = 400
+    weaponCharged = true
+
+    me = reactive<iShip>({
+        position: positionMiddle,
+        vector: noVector,
+        radius: ships[shipMode.value].radius,
+        weaponRadius: ships[shipMode.value].weaponRadius,
+    })
+    me.position.x = 400
+    me.position.y = 400
+
   playing.value = true
 }
 
@@ -198,7 +248,7 @@ function captureMovement(sketch: P5) {
     movement.y = 1
   }
 
-  const vector = sketch.createVector(movement.x * sketch.deltaTime * playerSpeed / 1000, movement.y * sketch.deltaTime * playerSpeed / 1000)
+  const vector = sketch.createVector(movement.x * sketch.deltaTime * ships[shipMode.value].speed / 1000, movement.y * sketch.deltaTime * ships[shipMode.value].speed / 1000)
   if(playing.value)
     me.position.add(vector)
 
@@ -206,7 +256,6 @@ function captureMovement(sketch: P5) {
   me.position.y = sketch.min(me.position.y, arena.height)
   me.position.x = sketch.max(me.position.x, 0)
   me.position.y = sketch.max(me.position.y, 0)
-
 }
 
 function createAsteroid(sketch: P5): void {
@@ -222,21 +271,38 @@ function createAsteroid(sketch: P5): void {
   })
 }
 
-function checkCollision(sketch: P5): boolean {
+function checkCollision(): boolean {
   let found = false
-  asteroids.value.forEach((asteroid: iAsteroid) => {
-    const xDiff = sketch.abs(me.position.x - asteroid.position.x)
-    const yDiff = sketch.abs(me.position.y - asteroid.position.y)
 
-    const xSquared = xDiff * xDiff
-    const ySquared = yDiff * yDiff
+  asteroids.value.forEach((asteroid: iAsteroid) => {
     const zSquared = (asteroid.radius + me.radius) * (asteroid.radius + me.radius)
 
-    if(xSquared + ySquared < zSquared)
+    if(asteroid.distanceSquared < zSquared)
       found = true
-
   })
   return found
+}
+
+function checkWeapon() {
+    let weapon = -1
+  asteroids.value.forEach((asteroid: iAsteroid, index: number) => {
+    const zSquared = (asteroid.radius + me.weaponRadius) * (asteroid.radius + me.weaponRadius)
+    if(asteroid.distanceSquared < zSquared)
+      weapon = index
+  })
+    return weapon
+}
+
+function getDistances(sketch: P5) {
+    asteroids.value.forEach((asteroid: iAsteroid) => {
+        const xDiff = sketch.abs(me.position.x - asteroid.position.x)
+        const yDiff = sketch.abs(me.position.y - asteroid.position.y)
+
+        const xSquared = xDiff * xDiff
+        const ySquared = yDiff * yDiff
+
+        asteroid.distanceSquared = xSquared + ySquared
+    })
 }
 </script>
 
@@ -277,8 +343,11 @@ function checkCollision(sketch: P5): boolean {
           <div class="text-center ">You got to level</div>
           <div class="text-center text-7xl font-bold">{{ asteroidCount }}</div>
         </div>
-        <button @click="start" class="my-4 p-4 px-5 rounded-2xl bg-green-600 text-white font-bold">Start</button>
-          <a class="underline" href="/">Home</a>
+        <div class="w-full flex justify-around my-4">
+          <button @click="start('dodge')" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Dodge</button>
+          <button @click="start('laser')" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Laser</button>
+        </div>
+        <a class="underline" href="/">Home</a>
       </div>
     </div>
   </transition>
