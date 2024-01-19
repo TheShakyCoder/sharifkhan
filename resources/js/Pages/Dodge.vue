@@ -2,7 +2,8 @@
 import P5 from 'p5'
 import {onMounted, reactive, Ref, ref} from "vue";
 
-import nipplejs from 'nipplejs';
+import nippleJs from 'nipplejs';
+import {Head} from "@inertiajs/vue3";
 
 const touchScreen = ref(false)
 const joystick = ref(null)
@@ -15,11 +16,10 @@ const nippleAngle: Ref<number | null> = ref(null)
 
 onMounted(() => {
     if(window.matchMedia("(pointer: coarse)").matches) {
-        // touchscreen
         touchScreen.value = true
     }
 
-    joystick.value = nipplejs.create({
+    joystick.value = nippleJs.create({
         zone: document.getElementById('zone_joystick') as HTMLElement,
         mode: 'semi',
         restJoystick: true
@@ -238,7 +238,7 @@ function captureMovement(sketch: P5) {
       )
   else
     vector = sketch.createVector(movement.x * sketch.deltaTime * ships[shipMode.value].speed / 1000, movement.y * sketch.deltaTime * ships[shipMode.value].speed / 1000)
-  
+
   if(playing.value)
     me.position.add(vector)
 
@@ -297,6 +297,8 @@ function getDistances(sketch: P5) {
 </script>
 
 <template>
+    <Head title="Dodge Game" />
+
   <div class="bottom-1 left-1 right-1 bg-red-500 bg-opacity-50 h-28 z-30" :class="[touchScreen ? 'absolute' : 'hidden']" id="zone_joystick"></div>
   <div class="absolute left-0 top-0 right-0 z-20">
     <ul class="bg-white bg-opacity-50 px-8 py-6">
@@ -338,6 +340,7 @@ function getDistances(sketch: P5) {
           <button @click="start('shield')" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Shield</button>
         </div>
         <a class="underline" href="/">Home</a>
+        <a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/Dodge.vue">Source Code</a>
       </div>
     </div>
   </transition>
