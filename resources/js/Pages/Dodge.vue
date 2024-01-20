@@ -37,11 +37,19 @@ interface iAsteroid {
   position: P5.Vector,
   vector: P5.Vector,
   radius: number,
+  distanceSquared: number
 }
 
 interface iShip {
   position: P5.Vector,
   vector: P5.Vector,
+  radius: number,
+  weaponRadius: number
+}
+
+interface iShipType {
+  name: string,
+  speed: number,
   radius: number,
   weaponRadius: number
 }
@@ -63,18 +71,20 @@ const frameRate = ref(40)
 const delta = ref(0)
 
 const shipMode = ref('dodge')
-const ships = reactive({
-    dodge: {
+const shipTypes: iShipType[] = reactive([
+    {
+        name: 'dodge',
         speed: 60,
         radius: 20,
         weaponRadius: 1
     },
-    shield: {
+    {
+        name: 'shield',
         speed: 50,
         radius: 25,
         weaponRadius: 50
     }
-})
+])
 
 const asteroidSpeed = 70
 const weaponChargeTime = 5000
@@ -98,7 +108,7 @@ new P5(( sketch: P5 ) => {
     setInterval(createAsteroid, 1000, sketch)
   }
   sketch.draw = () => {
-    delta.value = parseInt(sketch.frameRate())
+    delta.value = sketch.frameRate()
     sketch.background(100)
     sketch.push()
     sketch.translate(sketch.width / 2, sketch.height / 2)
@@ -148,42 +158,45 @@ new P5(( sketch: P5 ) => {
       sketch.text(asteroid.name, asteroid.position.x, asteroid.position.y)
     })
 
-    if(me) {
-        if(weaponCharged)
-            sketch.fill(0, 180, 0)
-        else
-            sketch.fill(255, 0, 0)
-      sketch.noStroke()
-      sketch.circle(me.position.x, me.position.y, me.radius * 2)
-      //  weapon
-      sketch.noFill()
-        if(weaponCharged)
-            sketch.stroke(0, 180, 0)
-        else
-            sketch.stroke(255, 0, 0)
-
-      sketch.strokeWeight(1)
-      sketch.circle(me.position.x, me.position.y, me.weaponRadius * 2)
-      //  level text
-      sketch.fill(255)
-      sketch.textSize(20)
-      sketch.textStyle(sketch.BOLD)
-      sketch.textAlign(sketch.CENTER, sketch.CENTER);
-      sketch.noStroke()
-      sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
-
-      captureMovement(sketch)
-      getDistances(sketch)
-      const checkWeaponResult = checkWeapon()
-      if(checkWeaponResult > -1 && weaponCharged)
-        laserAsteroid(sketch, checkWeaponResult)
-      if(checkCollision())
-        end()
-    }
+    if(me)
+      processMe(sketch, me)
 
     sketch.pop()
   }
 })
+
+function processMe(sketch: P5, me: iShip) {
+    if(weaponCharged)
+        sketch.fill(0, 180, 0)
+    else
+        sketch.fill(255, 0, 0)
+    sketch.noStroke()
+    sketch.circle(me.position.x, me.position.y, me.radius * 2)
+    //  weapon
+    sketch.noFill()
+    if(weaponCharged)
+        sketch.stroke(0, 180, 0)
+    else
+        sketch.stroke(255, 0, 0)
+
+    sketch.strokeWeight(1)
+    sketch.circle(me.position.x, me.position.y, me.weaponRadius * 2)
+    //  level text
+    sketch.fill(255)
+    sketch.textSize(20)
+    sketch.textStyle(sketch.BOLD)
+    sketch.textAlign(sketch.CENTER, sketch.CENTER);
+    sketch.noStroke()
+    sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
+
+    captureMovement(sketch)
+    getDistances(sketch)
+    const checkWeaponResult = checkWeapon()
+    if(checkWeaponResult > -1 && weaponCharged)
+        laserAsteroid(sketch, checkWeaponResult)
+    if(checkCollision())
+        end()
+}
 
 function laserAsteroid(sketch: P5, asteroidIndex: number) {
     asteroids.value.splice(asteroidIndex, 1)
@@ -202,8 +215,8 @@ function start(mode: string) {
     me = reactive<iShip>({
         position: positionMiddle,
         vector: noVector,
-        radius: ships[shipMode.value].radius,
-        weaponRadius: ships[shipMode.value].weaponRadius,
+        radius: shipTypes.find(ship => ship.name === shipMode.value).radius,
+        weaponRadius: shipTypes.find(ship => ship.name === shipMode.value).weaponRadius,
     })
     me.position.x = 400
     me.position.y = 400
@@ -233,11 +246,11 @@ function captureMovement(sketch: P5) {
 
   if(nippleAngle.value)
       vector = sketch.createVector(
-          sketch.cos(nippleAngle.value) * sketch.deltaTime * ships[shipMode.value].speed / 1000,
-          -sketch.sin(nippleAngle.value) * sketch.deltaTime * ships[shipMode.value].speed / 1000
+          sketch.cos(nippleAngle.value) * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000,
+          -sketch.sin(nippleAngle.value) * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000
       )
   else
-    vector = sketch.createVector(movement.x * sketch.deltaTime * ships[shipMode.value].speed / 1000, movement.y * sketch.deltaTime * ships[shipMode.value].speed / 1000)
+    vector = sketch.createVector(movement.x * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000, movement.y * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000)
 
   if(playing.value)
     me.position.add(vector)
@@ -257,7 +270,8 @@ function createAsteroid(sketch: P5): void {
     name: asteroidCount.value.toString(),
     position: sketch.createVector(0, 0),
     vector: sketch.createVector(sketch.random(-asteroidSpeed, asteroidSpeed), sketch.random(-asteroidSpeed, asteroidSpeed)),
-    radius: 25
+    radius: 25,
+    distanceSquared: arena.width
   })
 }
 
@@ -308,12 +322,13 @@ function getDistances(sketch: P5) {
       </li>
       <li class="flex">
         <div class="w-32">Frame Rate</div>
-        <div class="text-right font-bold w-16">{{ delta }}</div>
+        <div class="text-right font-bold w-16">{{ Math.round(delta) }}</div>
       </li>
 
     </ul>
   </div>
 
+    <div class="absolute inset-0 flex flex-col justify-center items-center">
   <transition
     enter-active-class="duration-150 ease-out"
     enter-from-class="opacity-0 scale-95"
@@ -322,8 +337,7 @@ function getDistances(sketch: P5) {
     leave-from-class="opacity-100 scale-100"
     leave-to-class="opacity-0 scale-95"
   >
-    <div v-if="!playing" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center z-40">
-      <div class="bg-white bg-opacity-70 rounded-xl w-60 text-black py-12 flex flex-col justify-center items-center">
+      <div  v-if="!playing" class="bg-white bg-opacity-80 rounded-xl w-60 text-black py-12 flex flex-col justify-center items-center z-30">
         <div v-if="asteroidCount === 0" class="text-center">
           <p v-if="touchScreen">Touch the red bar.</p>
           <p v-else>Use the WASD keys.</p>
@@ -342,8 +356,8 @@ function getDistances(sketch: P5) {
         <a class="underline" href="/">Home</a>
         <a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/Dodge.vue">Source Code</a>
       </div>
-    </div>
   </transition>
+    </div>
 </template>
 
 <style scoped>
