@@ -2,33 +2,36 @@
 import P5 from 'p5'
 import {onMounted, reactive, Ref, ref} from "vue";
 
-import nippleJs from 'nipplejs';
+import nippleJs, {JoystickManager} from 'nipplejs';
 import {Head} from "@inertiajs/vue3";
 
 const touchScreen = ref(false)
-const joystick = ref(null)
+let joystick: JoystickManager | null = null
 
 const joystickMovement = reactive({
     x: 0,
     y: 0
 })
-const nippleAngle: Ref<number | null> = ref(null)
+let nippleAngle: number | null = null
+let nippleForce: number = 0
 
 onMounted(() => {
-    if(window.matchMedia("(pointer: coarse)").matches) {
+    if(window.matchMedia("(pointer: coarse)").matches)
         touchScreen.value = true
-    }
 
-    joystick.value = nippleJs.create({
+    joystick = nippleJs.create({
         zone: document.getElementById('zone_joystick') as HTMLElement,
         mode: 'semi',
         restJoystick: true
     });
 
-    joystick.value.on('move', function(evt, data) {
-        nippleAngle.value = data.angle.radian
-    }).on('end', function (evt, data) {
-        nippleAngle.value = null
+    joystick.on('move', function(evt, data) {
+        nippleAngle = data.angle.radian
+        nippleForce = Math.min(1, data.force)
+    })
+        joystick.on('end', function (evt, data) {
+        nippleAngle = null
+        nippleForce = 0
     });
 })
 
@@ -67,11 +70,11 @@ const browser = {
 const asteroids = ref(<iAsteroid[]>[])
 const asteroidCount = ref(0)
 const maxAsteroids = 99
-const frameRate = ref(40)
+const frameRate = ref(33)
 const delta = ref(0)
 
 const shipMode = ref('dodge')
-const shipTypes: iShipType[] = reactive([
+const shipTypes: iShipType[] = [
     {
         name: 'dodge',
         speed: 60,
@@ -84,7 +87,7 @@ const shipTypes: iShipType[] = reactive([
         radius: 25,
         weaponRadius: 50
     }
-])
+]
 
 const asteroidSpeed = 70
 const weaponChargeTime = 5000
@@ -215,8 +218,8 @@ function start(mode: string) {
     me = reactive<iShip>({
         position: positionMiddle,
         vector: noVector,
-        radius: shipTypes.find(ship => ship.name === shipMode.value).radius,
-        weaponRadius: shipTypes.find(ship => ship.name === shipMode.value).weaponRadius,
+        radius: shipTypes.filter(ship => ship.name === shipMode.value)[0].radius,
+        weaponRadius: shipTypes.filter(ship => ship.name === shipMode.value)[0].weaponRadius,
     })
     me.position.x = 400
     me.position.y = 400
@@ -230,27 +233,30 @@ function end() {
 
 function captureMovement(sketch: P5) {
   let movement = {...joystickMovement}
-    let  vector
-  if (sketch.keyIsDown(65)) {
+  let vector
+  if (sketch.keyIsDown(65))
     movement.x = -1
-  }
-  if (sketch.keyIsDown(68)) {
-    movement.x = 1
-  }
-  if (sketch.keyIsDown(87)) {
-    movement.y = -1
-  }
-  if (sketch.keyIsDown(83)) {
-    movement.y = 1
-  }
 
-  if(nippleAngle.value)
+  if (sketch.keyIsDown(68))
+    movement.x = 1
+
+  if (sketch.keyIsDown(87))
+    movement.y = -1
+
+  if (sketch.keyIsDown(83))
+    movement.y = 1
+
+  const shipType = shipTypes.filter(ship => ship.name === shipMode.value)[0]
+  if(nippleAngle)
       vector = sketch.createVector(
-          sketch.cos(nippleAngle.value) * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000,
-          -sketch.sin(nippleAngle.value) * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000
+          sketch.cos(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1000,
+          -sketch.sin(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1000
       )
   else
-    vector = sketch.createVector(movement.x * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000, movement.y * sketch.deltaTime * shipTypes.find(ship => ship.name === shipMode.value).speed / 1000)
+    vector = sketch.createVector(
+        movement.x * sketch.deltaTime * shipType.speed / 1000,
+        movement.y * sketch.deltaTime * shipType.speed / 1000
+    )
 
   if(playing.value)
     me.position.add(vector)
