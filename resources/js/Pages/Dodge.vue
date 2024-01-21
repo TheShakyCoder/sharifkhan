@@ -90,6 +90,8 @@ const shipTypes: iShipType[] = [
 ]
 
 const asteroidSpeed = 70
+const asteroidRadius = 25
+
 const weaponChargeTime = 5000
 let weaponCharged = true
 
@@ -120,12 +122,18 @@ new P5(( sketch: P5 ) => {
     else
       sketch.translate(-arena.width / 2, -arena.height / 2)
 
+    drawArena(sketch)
+    processAsteroids(sketch, asteroids.value)
+    processMe(sketch, me)
 
-    //  ARENA
+    sketch.pop()
+  }
+})
+
+function drawArena(sketch: P5) {
     sketch.fill(55)
     sketch.rect(0, 0, arena.width, arena.height)
 
-    //  GRID
     sketch.stroke(255)
     sketch.strokeWeight(4)
     for(let x = 100; x < arena.width; x = x + 100) {
@@ -133,42 +141,43 @@ new P5(( sketch: P5 ) => {
             sketch.point(x, y)
         }
     }
+}
 
-    //  ASTEROIDS
-    sketch.stroke(255)
-    sketch.strokeWeight(1)
-    asteroids.value.forEach((asteroid : iAsteroid) => {
-      const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
-      asteroid.position.add(newVector)
-      if(asteroid.position.x > arena.width) {
-        asteroid.position.x = 0
-      }
-      if(asteroid.position.x < 0) {
-        asteroid.position.x = arena.width
-      }
-      if(asteroid.position.y > arena.height) {
-        asteroid.position.y = 0
-      }
-      if(asteroid.position.y < 0) {
-        asteroid.position.y = arena.height
-      }
+function processAsteroids(sketch: P5, asteroids: Array<iAsteroid>) {
+  sketch.stroke(255)
+  sketch.strokeWeight(1)
+  asteroids.forEach((asteroid : iAsteroid) => {
+      processAsteroid(sketch, asteroid)
+  })
+}
 
-      sketch.fill(0)
-      sketch.circle(asteroid.position.x, asteroid.position.y, asteroid.radius * 2)
-      sketch.fill(255)
-      sketch.textSize(18)
-      sketch.textAlign(sketch.CENTER, sketch.CENTER);
-      sketch.text(asteroid.name, asteroid.position.x, asteroid.position.y)
-    })
+function processAsteroid(sketch: P5, asteroid: iAsteroid) {
+  const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
+  asteroid.position.add(newVector)
+  if(asteroid.position.x > (arena.width + asteroid.radius))
+    asteroid.position.x = -asteroid.radius
+  if(asteroid.position.x < -asteroid.radius)
+    asteroid.position.x = arena.width + asteroid.radius
+  if(asteroid.position.y > (arena.height + asteroid.radius))
+    asteroid.position.y = -asteroid.radius
+  if(asteroid.position.y < -asteroid.radius)
+    asteroid.position.y = arena.height + asteroid.radius
+  drawAsteroid(sketch, asteroid)
+}
 
-    if(me)
-      processMe(sketch, me)
-
-    sketch.pop()
-  }
-})
+function drawAsteroid(sketch: P5, asteroid: iAsteroid) {
+  sketch.fill(0)
+  sketch.circle(asteroid.position.x, asteroid.position.y, asteroid.radius * 2)
+  sketch.fill(255)
+  sketch.textSize(18)
+  sketch.textAlign(sketch.CENTER, sketch.CENTER);
+  sketch.text(asteroid.name, asteroid.position.x, asteroid.position.y)
+}
 
 function processMe(sketch: P5, me: iShip) {
+    if(!me)
+        return
+
     if(weaponCharged)
         sketch.fill(0, 180, 0)
     else
@@ -274,9 +283,9 @@ function createAsteroid(sketch: P5): void {
   asteroidCount.value++
   asteroids.value.push({
     name: asteroidCount.value.toString(),
-    position: sketch.createVector(0, 0),
+    position: sketch.createVector(-asteroidRadius, -asteroidRadius),
     vector: sketch.createVector(sketch.random(-asteroidSpeed, asteroidSpeed), sketch.random(-asteroidSpeed, asteroidSpeed)),
-    radius: 25,
+    radius: asteroidRadius,
     distanceSquared: arena.width
   })
 }
@@ -321,7 +330,7 @@ function getDistances(sketch: P5) {
 
   <div class="bottom-1 left-1 right-1 bg-red-500 bg-opacity-50 h-28 z-30" :class="[touchScreen ? 'absolute' : 'hidden']" id="zone_joystick"></div>
   <div class="absolute left-0 top-0 right-0 z-20">
-    <ul class="bg-white bg-opacity-50 px-8 py-6">
+    <ul class="bg-white bg-opacity-50 px-5 sm:px-8 py-4 sm:py-6">
       <li class="flex">
         <div class="w-32">Level</div>
         <div class="text-right font-bold w-16">{{ asteroidCount }}</div>
