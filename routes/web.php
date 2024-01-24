@@ -25,7 +25,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dodge', function () {
-    return Inertia::render('Dodge');
+    return Inertia::render('Dodge/Index');
 })->name('dodge');
 
 //Route::middleware([

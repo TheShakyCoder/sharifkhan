@@ -5,6 +5,10 @@ import {onMounted, reactive, Ref, ref} from "vue";
 import nippleJs, {JoystickManager} from 'nipplejs';
 import {Head} from "@inertiajs/vue3";
 
+import {iAsteroid} from "./Interfaces/iAsteroid"
+import {iShip} from "./Interfaces/iShip"
+import {iShipType} from "./Interfaces/iShipType"
+
 const touchScreen = ref(false)
 let joystick: JoystickManager | null = null
 
@@ -34,28 +38,6 @@ onMounted(() => {
         nippleForce = 0
     });
 })
-
-interface iAsteroid {
-  name: string,
-  position: P5.Vector,
-  vector: P5.Vector,
-  radius: number,
-  distanceSquared: number
-}
-
-interface iShip {
-  position: P5.Vector,
-  vector: P5.Vector,
-  radius: number,
-  weaponRadius: number
-}
-
-interface iShipType {
-  name: string,
-  speed: number,
-  radius: number,
-  weaponRadius: number
-}
 
 const arena = {
   width: 800,
@@ -146,12 +128,12 @@ function drawArena(sketch: P5) {
 function processAsteroids(sketch: P5, asteroids: Array<iAsteroid>) {
   sketch.stroke(255)
   sketch.strokeWeight(1)
-  asteroids.forEach((asteroid : iAsteroid) => {
-      processAsteroid(sketch, asteroid)
+  asteroids.forEach((asteroid: iAsteroid, index: number) => {
+      processAsteroid(sketch, asteroid, index)
   })
 }
 
-function processAsteroid(sketch: P5, asteroid: iAsteroid) {
+function processAsteroid(sketch: P5, asteroid: iAsteroid, index: number) {
   const newVector = sketch.createVector(asteroid.vector.x * sketch.deltaTime / 1000, asteroid.vector.y * sketch.deltaTime / 1000)
   asteroid.position.add(newVector)
   if(asteroid.position.x > (arena.width + asteroid.radius))
@@ -162,7 +144,17 @@ function processAsteroid(sketch: P5, asteroid: iAsteroid) {
     asteroid.position.y = -asteroid.radius
   if(asteroid.position.y < -asteroid.radius)
     asteroid.position.y = arena.height + asteroid.radius
+
+  asteroid.distanceSquared = getDistance(asteroid)
+  if(checkShield(asteroid) && weaponCharged)
+    destroyAsteroid(index)
+  if(checkCollision(asteroid))
+    collided(asteroid)
   drawAsteroid(sketch, asteroid)
+}
+
+function collided(asteroid: iAsteroid) {
+    end()
 }
 
 function drawAsteroid(sketch: P5, asteroid: iAsteroid) {
@@ -202,15 +194,14 @@ function processMe(sketch: P5, me: iShip) {
     sketch.text(asteroidCount.value.toString(), me.position.x, me.position.y)
 
     captureMovement(sketch)
-    getDistances(sketch)
-    const checkWeaponResult = checkWeapon()
-    if(checkWeaponResult > -1 && weaponCharged)
-        laserAsteroid(sketch, checkWeaponResult)
-    if(checkCollision())
-        end()
 }
 
-function laserAsteroid(sketch: P5, asteroidIndex: number) {
+function checkShield(asteroid: iAsteroid) {
+    const zSquared = (asteroid.radius + me.weaponRadius) * (asteroid.radius + me.weaponRadius)
+    return asteroid.distanceSquared < zSquared
+}
+
+function destroyAsteroid(asteroidIndex: number) {
     asteroids.value.splice(asteroidIndex, 1)
     weaponCharged = false
     setTimeout(function () {
@@ -257,14 +248,14 @@ function captureMovement(sketch: P5) {
 
   const shipType = shipTypes.filter(ship => ship.name === shipMode.value)[0]
   if(nippleAngle)
-      vector = sketch.createVector(
-          sketch.cos(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1000,
-          -sketch.sin(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1000
-      )
+    vector = sketch.createVector(
+      sketch.cos(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1000,
+      -sketch.sin(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1000
+    )
   else
     vector = sketch.createVector(
-        movement.x * sketch.deltaTime * shipType.speed / 1000,
-        movement.y * sketch.deltaTime * shipType.speed / 1000
+      movement.x * sketch.deltaTime * shipType.speed / 1000,
+      movement.y * sketch.deltaTime * shipType.speed / 1000
     )
 
   if(playing.value)
@@ -286,42 +277,24 @@ function createAsteroid(sketch: P5): void {
     position: sketch.createVector(-asteroidRadius, -asteroidRadius),
     vector: sketch.createVector(sketch.random(-asteroidSpeed, asteroidSpeed), sketch.random(-asteroidSpeed, asteroidSpeed)),
     radius: asteroidRadius,
-    distanceSquared: arena.width
+    distanceSquared: arena.width,
+    life: 5
   })
 }
 
-function checkCollision(): boolean {
-  let found = false
-
-  asteroids.value.forEach((asteroid: iAsteroid) => {
+function checkCollision(asteroid: iAsteroid): boolean {
     const zSquared = (asteroid.radius + me.radius) * (asteroid.radius + me.radius)
-
-    if(asteroid.distanceSquared < zSquared)
-      found = true
-  })
-  return found
+    return asteroid.distanceSquared < zSquared
 }
 
-function checkWeapon() {
-    let weapon = -1
-  asteroids.value.forEach((asteroid: iAsteroid, index: number) => {
-    const zSquared = (asteroid.radius + me.weaponRadius) * (asteroid.radius + me.weaponRadius)
-    if(asteroid.distanceSquared < zSquared)
-      weapon = index
-  })
-    return weapon
-}
+function getDistance(asteroid: iAsteroid) {
+    const xDiff = Math.abs(me.position.x - asteroid.position.x)
+    const yDiff = Math.abs(me.position.y - asteroid.position.y)
 
-function getDistances(sketch: P5) {
-    asteroids.value.forEach((asteroid: iAsteroid) => {
-        const xDiff = sketch.abs(me.position.x - asteroid.position.x)
-        const yDiff = sketch.abs(me.position.y - asteroid.position.y)
+    const xSquared = xDiff * xDiff
+    const ySquared = yDiff * yDiff
 
-        const xSquared = xDiff * xDiff
-        const ySquared = yDiff * yDiff
-
-        asteroid.distanceSquared = xSquared + ySquared
-    })
+    return  xSquared + ySquared
 }
 </script>
 
