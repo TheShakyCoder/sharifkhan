@@ -61,13 +61,15 @@ const shipTypes: iShipType[] = [
         name: 'dodge',
         speed: 60,
         radius: 20,
-        weaponRadius: 1
+        shieldRadius: 1,
+        life: 2
     },
     {
         name: 'shield',
         speed: 50,
         radius: 25,
-        weaponRadius: 50
+        shieldRadius: 50,
+        life: 2
     }
 ]
 
@@ -184,7 +186,7 @@ function processMe(sketch: P5, me: iShip) {
         sketch.stroke(255, 0, 0)
 
     sketch.strokeWeight(1)
-    sketch.circle(me.position.x, me.position.y, me.weaponRadius * 2)
+    sketch.circle(me.position.x, me.position.y, me.shieldRadius * 2)
     //  level text
     sketch.fill(255)
     sketch.textSize(20)
@@ -197,7 +199,7 @@ function processMe(sketch: P5, me: iShip) {
 }
 
 function checkShield(asteroid: iAsteroid) {
-    const zSquared = (asteroid.radius + me.weaponRadius) * (asteroid.radius + me.weaponRadius)
+    const zSquared = (asteroid.radius + me.shieldRadius) * (asteroid.radius + me.shieldRadius)
     return asteroid.distanceSquared < zSquared
 }
 
@@ -219,7 +221,8 @@ function start(mode: string) {
         position: positionMiddle,
         vector: noVector,
         radius: shipTypes.filter(ship => ship.name === shipMode.value)[0].radius,
-        weaponRadius: shipTypes.filter(ship => ship.name === shipMode.value)[0].weaponRadius,
+        shieldRadius: shipTypes.filter(ship => ship.name === shipMode.value)[0].shieldRadius,
+        life: shipTypes.filter(ship => ship.name === shipMode.value)[0].life
     })
     me.position.x = 400
     me.position.y = 400

@@ -1,8 +1,6 @@
 import P5 from "p5";
+import {iObject} from "./iObject";
 
-export interface iShip {
-    position: P5.Vector,
-    vector: P5.Vector,
-    radius: number,
-    weaponRadius: number
+export interface iShip extends iObject {
+    shieldRadius: number
 }

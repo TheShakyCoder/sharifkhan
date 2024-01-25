@@ -1,10 +1,7 @@
 import P5 from "p5";
+import {iObject} from "./iObject";
 
-export interface iAsteroid {
+export interface iAsteroid extends iObject {
     name: string,
-    position: P5.Vector,
-    vector: P5.Vector,
-    radius: number,
     distanceSquared: number,
-    life: number
 }
