@@ -67,13 +67,14 @@ function sketchDraw(sketch: P5) {
     arena.frameRate = sketch.frameRate()
     sketch.background(50)
 
-
     sketch.push()
 
     sketch.translate(sketch.width / 2, sketch.height / 2)
 
-    if(me)
+    if(me && arena.playing)
         processMe(sketch)
+    else if(me)
+        sketch.translate(-me.position.x, -me.position.y)
     else
         sketch.translate(-arena.width / 2, -arena.height / 2)
 
@@ -81,7 +82,7 @@ function sketchDraw(sketch: P5) {
     processRockets(sketch)
     processAsteroids(sketch)
 
-    if(me)
+    if(me && arena.playing)
         drawMe(sketch)
 
     sketch.pop()
@@ -143,8 +144,6 @@ function drawRocket(rocket: IRocket, sketch: P5) {
 }
 
 function processMe(sketch: P5) {
-    if(!arena.playing)
-        return
     if(touchScreen.enabled)
         me.angle = touchScreen.angle2
     else
