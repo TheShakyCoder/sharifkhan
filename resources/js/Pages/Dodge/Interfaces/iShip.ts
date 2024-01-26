@@ -1,6 +1,5 @@
-import P5 from "p5";
-import {iObject} from "./iObject";
+import {iBody} from "./iBody";
 
-export interface iShip extends iObject {
+export interface iShip extends iBody {
     shieldRadius: number
 }

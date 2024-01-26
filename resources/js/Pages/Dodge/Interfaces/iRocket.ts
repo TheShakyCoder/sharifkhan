@@ -1,4 +1,4 @@
 import P5 from "p5";
-import {iObject} from "./iObject";
+import {iBody} from "./iBody";
 
-export interface iRocket extends iObject  {}
+export interface iRocket extends iBody  {}

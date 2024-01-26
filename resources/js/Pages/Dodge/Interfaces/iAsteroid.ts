@@ -1,7 +1,6 @@
-import P5 from "p5";
-import {iObject} from "./iObject";
+import {iBody} from "./iBody";
 
-export interface iAsteroid extends iObject {
+export interface iAsteroid extends iBody {
     name: string,
     distanceSquared: number,
 }

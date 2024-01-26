@@ -28,6 +28,10 @@ Route::get('/dodge', function () {
     return Inertia::render('Dodge/Index');
 })->name('dodge');
 
+Route::get('/asteroids', function () {
+    return Inertia::render('Asteroids/Index');
+})->name('asteroids');
+
 //Route::middleware([
 //    'auth:sanctum',
 //    config('jetstream.auth_session'),
