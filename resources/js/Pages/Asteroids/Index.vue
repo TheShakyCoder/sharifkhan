@@ -65,7 +65,7 @@ function sketchSetup(sketch: P5) {
 function sketchDraw(sketch: P5) {
     mousePosition.value = sketch.createVector(sketch.mouseX, sketch.mouseY)
     arena.frameRate = sketch.frameRate()
-    sketch.background(50)
+    sketch.background(20)
 
     sketch.push()
 
@@ -108,17 +108,10 @@ function processAsteroids(sketch: P5) {
             end()
 
         if(alive)
-            drawAsteroid(asteroid, sketch)
+            asteroid.draw(sketch)
         else
             asteroids.value.splice(a, 1)
     }
-}
-
-function drawAsteroid(asteroid: IAsteroid, sketch: P5) {
-    sketch.fill(0)
-    sketch.strokeWeight(1)
-    sketch.stroke(255)
-    sketch.circle(asteroid.position.x, asteroid.position.y, asteroid.radius * 2)
 }
 
 function processRockets(sketch: P5) {
@@ -191,7 +184,7 @@ function captureKeys(sketch: P5): P5.Vector {
 }
 
 function drawArena(sketch: P5) {
-    sketch.fill(55)
+    sketch.fill(10)
     sketch.rect(0, 0, arena.width, arena.height)
 
     sketch.stroke(100)

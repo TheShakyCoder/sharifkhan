@@ -8,4 +8,5 @@ export interface IAsteroid extends IBody {
     collide(sketch: P5, rockets: IRocket[]): number,
     damage(hit: number): boolean
     hitMe(sketch: P5, me: IShip): boolean
+    draw(sketch: P5): void
 }
