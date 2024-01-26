@@ -245,7 +245,7 @@ function touchEnabled() {
     touchScreen.joystick1 = nippleJs.create({
         zone: document.getElementById(touchScreen.element1) as HTMLElement,
         mode: 'static',
-        position: { left: '70px', bottom: '70px' },
+        position: { left: '100px', bottom: '120px' },
     });
     touchScreen.joystick1.on('move', function(evt, data) {
         touchScreen.angle1 = data.angle.radian
@@ -259,7 +259,7 @@ function touchEnabled() {
     touchScreen.joystick2 = nippleJs.create({
         zone: document.getElementById(touchScreen.element2) as HTMLElement,
         mode: 'static',
-        position: { right: '70px', bottom: '70px' },
+        position: { right: '100px', bottom: '120px' },
     });
     touchScreen.joystick2.on('move', function(evt, data) {
         touchScreen.angle2 = -data.angle.radian + Math.PI / 2
