@@ -2078,7 +2078,7 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
     const arena = reactive({
       width: 800,
       height: 800,
-      frameRate: 50,
+      frameRate: 30,
       asteroidCount: 0,
       maxAsteroids: 999,
       playing: false
@@ -2166,10 +2166,12 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
       }
     }
     function everyTenthOfASecond(sketch) {
-      createRocket(sketch);
+      if (arena.playing)
+        createRocket(sketch);
     }
     function everySecond(sketch) {
-      createAsteroid(sketch);
+      if (arena.playing)
+        createAsteroid(sketch);
     }
     function createAsteroid(sketch) {
       if (!arena.playing)
@@ -2201,7 +2203,7 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
       touchScreen.joystick1 = nippleJs.create({
         zone: document.getElementById(touchScreen.element1),
         mode: "static",
-        position: { left: "100px", bottom: "120px" }
+        position: { left: "70px", bottom: "48%" }
       });
       touchScreen.joystick1.on("move", function(evt, data) {
         touchScreen.angle1 = data.angle.radian;
@@ -2214,7 +2216,7 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
       touchScreen.joystick2 = nippleJs.create({
         zone: document.getElementById(touchScreen.element2),
         mode: "static",
-        position: { right: "100px", bottom: "120px" }
+        position: { right: "70px", bottom: "48%" }
       });
       touchScreen.joystick2.on("move", function(evt, data) {
         touchScreen.angle2 = -data.angle.radian + Math.PI / 2;
@@ -2230,11 +2232,11 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
     return (_ctx, _push, _parent, _attrs) => {
       _push(`<!--[-->`);
       _push(ssrRenderComponent(unref(Head), { title: "Asteroids Game" }, null, _parent));
-      _push(`<div class="absolute inset-0 flex flex-col justify-center items-center z-10">`);
+      _push(`<div class="absolute inset-0 flex flex-col justify-center items-center z-20">`);
       if (!arena.playing) {
         _push(`<div class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-12 z-30">`);
         if (arena.asteroidCount === 0) {
-          _push(`<div class="text-center">`);
+          _push(`<div class="text-center"><p>LANDSCAPE mode is best</p>`);
           if (touchScreen.enabled) {
             _push(`<p>Touch the red bar.</p>`);
           } else {
@@ -2248,7 +2250,7 @@ const _sfc_main$n = /* @__PURE__ */ defineComponent({
       } else {
         _push(`<!---->`);
       }
-      _push(`</div><div class="h-screen flex flex-col justify-between w-full"><div class="bg-white bg-opacity-40 z-10 p-2"><div class="flex justify-between"><div>Score</div><div>${ssrInterpolate(arena.asteroidCount)}</div></div><div class="flex justify-between"><div>Frame Rate</div><div>${ssrInterpolate(Math.round(arena.frameRate))}</div></div></div><div class="${ssrRenderClass([[touchScreen.enabled ? "bg-opacity-40" : "bg-opacity-0"], "flex bg-red-500 h-32 z-10"])}"><div class="w-1/2"${ssrRenderAttr("id", touchScreen.element1)}></div><div class="w-1/2"${ssrRenderAttr("id", touchScreen.element2)}></div></div></div><!--]-->`);
+      _push(`</div><div class="w-screen flex flex-row justify-between items-start"><div class="w-0 h-screen z-20"${ssrRenderAttr("id", touchScreen.element1)}></div><div class="bg-white bg-opacity-40 z-10 p-2 flex-grow text-xl"><div class="flex justify-between w-40"><div>Score</div><div class="font-bold">${ssrInterpolate(arena.asteroidCount)}</div></div><div class="flex justify-between w-40"><div>Frame Rate</div><div class="font-bold">${ssrInterpolate(Math.round(arena.frameRate))}</div></div></div><div class="w-0 h-screen z-20"${ssrRenderAttr("id", touchScreen.element2)}></div></div><!--]-->`);
     };
   }
 });

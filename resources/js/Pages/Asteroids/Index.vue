@@ -30,7 +30,7 @@ const touchScreen: ITouchScreen = reactive({
 const arena: IArena = reactive({
     width: 800,
     height: 800,
-    frameRate: 50,
+    frameRate: 30,
     asteroidCount: 0,
     maxAsteroids: 999,
     playing: false
@@ -197,10 +197,12 @@ function drawArena(sketch: P5) {
 }
 
 function everyTenthOfASecond(sketch: P5) {
+    if(arena.playing)
     createRocket(sketch)
 }
 
 function everySecond(sketch: P5) {
+    if(arena.playing)
     createAsteroid(sketch)
 }
 
@@ -237,7 +239,7 @@ function touchEnabled() {
     touchScreen.joystick1 = nippleJs.create({
         zone: document.getElementById(touchScreen.element1) as HTMLElement,
         mode: 'static',
-        position: { left: '100px', bottom: '120px' },
+        position: { left: '70px', bottom: '48%' },
     });
     touchScreen.joystick1.on('move', function(evt, data) {
         touchScreen.angle1 = data.angle.radian
@@ -251,7 +253,7 @@ function touchEnabled() {
     touchScreen.joystick2 = nippleJs.create({
         zone: document.getElementById(touchScreen.element2) as HTMLElement,
         mode: 'static',
-        position: { right: '100px', bottom: '120px' },
+        position: { right: '70px', bottom: '48%' },
     });
     touchScreen.joystick2.on('move', function(evt, data) {
         touchScreen.angle2 = -data.angle.radian + Math.PI / 2
@@ -286,7 +288,7 @@ function end() {
 <template>
     <Head title="Asteroids Game" />
 
-    <div  class="absolute inset-0 flex flex-col justify-center items-center z-10">
+    <div  class="absolute inset-0 flex flex-col justify-center items-center z-20">
       <transition
         enter-active-class="duration-150 ease-out"
         enter-from-class="opacity-0 scale-95"
@@ -300,6 +302,7 @@ function end() {
               class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-12 z-30"
           >
             <div v-if="arena.asteroidCount === 0" class="text-center">
+              <p>LANDSCAPE mode is best</p>
               <p v-if="touchScreen.enabled">Touch the red bar.</p>
               <p v-else>Use the WASD keys and mouse.</p>
               <p>Survive.</p>
@@ -318,23 +321,40 @@ function end() {
       </transition>
     </div>
 
-    <div class="h-screen flex flex-col justify-between w-full">
-        <div class="bg-white bg-opacity-40 z-10 p-2">
-            <div class="flex justify-between">
+    <div class="w-screen flex flex-row justify-between items-start">
+
+        <div class="w-0 h-screen z-20" :id="touchScreen.element1"></div>
+
+        <div class="bg-white bg-opacity-40 z-10 p-2 flex-grow text-xl">
+            <div class="flex justify-between w-40">
                 <div>Score</div>
-                <div>{{ arena.asteroidCount }}</div>
+                <div class="font-bold">{{ arena.asteroidCount }}</div>
             </div>
-            <div class="flex justify-between">
+            <div class="flex justify-between w-40">
                 <div>Frame Rate</div>
-                <div>{{ Math.round(arena.frameRate) }}</div>
+                <div class="font-bold">{{ Math.round(arena.frameRate) }}</div>
             </div>
-<!--s-->
         </div>
-        <div class="flex bg-red-500  h-32 z-10" :class="[touchScreen.enabled ? 'bg-opacity-40' : 'bg-opacity-0']">
-            <div class="w-1/2" :id="touchScreen.element1"></div>
-            <div class="w-1/2" :id="touchScreen.element2"></div>
-        </div>
+
+        <div class="w-0 h-screen z-20" :id="touchScreen.element2"></div>
+
     </div>
+<!--    <div class="h-screen flex flex-col justify-between w-full">-->
+<!--        <div class="bg-white bg-opacity-40 z-10 p-2">-->
+<!--            <div class="flex justify-between">-->
+<!--                <div>Score</div>-->
+<!--                <div>{{ arena.asteroidCount }}</div>-->
+<!--            </div>-->
+<!--            <div class="flex justify-between">-->
+<!--                <div>Frame Rate</div>-->
+<!--                <div>{{ Math.round(arena.frameRate) }}</div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="flex bg-red-500  h-32 z-10" :class="[touchScreen.enabled ? 'bg-opacity-40' : 'bg-opacity-0']">-->
+<!--            <div class="w-1/2" :id="touchScreen.element1"></div>-->
+<!--            <div class="w-1/2" :id="touchScreen.element2"></div>-->
+<!--        </div>-->
+<!--    </div>-->
 
 </template>
 
