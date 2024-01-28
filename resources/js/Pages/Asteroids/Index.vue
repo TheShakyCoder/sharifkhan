@@ -303,7 +303,7 @@ function end() {
           >
             <div v-if="arena.asteroidCount === 0" class="text-center">
               <p>LANDSCAPE mode is best</p>
-              <p v-if="touchScreen.enabled">Touch the red bar.</p>
+              <p v-if="touchScreen.enabled">Use the 2 joysticks..</p>
               <p v-else>Use the WASD keys and mouse.</p>
               <p>Survive.</p>
               <p>Muh ha ha ha!</p>
