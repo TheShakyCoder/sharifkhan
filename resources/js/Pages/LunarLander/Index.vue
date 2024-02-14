@@ -96,9 +96,7 @@ function moveMe(sketch: P5, input: P5.Vector) {
     me.acceleration = sketch.createVector(0,0)
     me.revolve(sketch, input)
     if(me.position.y + me.radius + me.legs > arena.height) {
-        if(me.angle > sketch.QUARTER_PI / 2 || me.angle < -sketch.QUARTER_PI / 2)
-            crash()
-        if(me.vector.mag() > 2)
+        if(me.angle > sketch.QUARTER_PI / 2 || me.angle < -sketch.QUARTER_PI / 2 || me.vector.mag() > 2)
             crash()
         me.position.y = arena.height - me.radius - me.legs
         me.vector = sketch.createVector(0, 0)
@@ -148,7 +146,6 @@ function start() {
 
 function crash() {
     alert('CRASH!')
-    end()
 }
 
 function end() {
