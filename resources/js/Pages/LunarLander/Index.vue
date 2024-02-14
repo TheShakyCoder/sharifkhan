@@ -97,10 +97,9 @@ function moveMe(sketch: P5, input: P5.Vector) {
     me.revolve(sketch, input)
     if(me.position.y + me.radius + me.legs > arena.height) {
         if(me.angle > sketch.QUARTER_PI / 2 || me.angle < -sketch.QUARTER_PI / 2 || me.vector.mag() > 2)
-            crash()
-        me.position.y = arena.height - me.radius - me.legs
-        me.vector = sketch.createVector(0, 0)
-        end()
+            crash(sketch)
+        else
+            end(sketch)
     }
 }
 
@@ -144,11 +143,17 @@ function start() {
     arena.playing = true
 }
 
-function crash() {
+function crash(sketch: P5) {
     alert('CRASH!')
+    me.position.y = arena.height - me.radius - me.legs
+    me.vector = sketch.createVector(0, 0)
+    arena.playing = false
 }
 
-function end() {
+function end(sketch: P5) {
+    alert('SAFE!')
+    me.position.y = arena.height - me.radius - me.legs
+    me.vector = sketch.createVector(0, 0)
     arena.playing = false
 }
 
