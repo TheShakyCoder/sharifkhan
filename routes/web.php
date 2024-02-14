@@ -32,6 +32,10 @@ Route::get('/asteroids', function () {
     return Inertia::render('Asteroids/Index');
 })->name('asteroids');
 
+Route::get('/lander', function () {
+    return Inertia::render('LunarLander/Index');
+})->name('lander');
+
 //Route::middleware([
 //    'auth:sanctum',
 //    config('jetstream.auth_session'),

@@ -198,12 +198,12 @@ function drawArena(sketch: P5) {
 
 function everyTenthOfASecond(sketch: P5) {
     if(arena.playing)
-    createRocket(sketch)
+        createRocket(sketch)
 }
 
 function everySecond(sketch: P5) {
     if(arena.playing)
-    createAsteroid(sketch)
+        createAsteroid(sketch)
 }
 
 function createAsteroid(sketch: P5) {
