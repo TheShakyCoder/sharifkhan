@@ -176,7 +176,8 @@ function end(sketch: P5) {
                 class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-8 z-30"
             >
                 <div class="text-center">
-                    <p>LANDSCAPE mode is best</p>
+                    <h2>This is work-in-progress game.</h2>
+                    <p v-if="touchScreen.enabled">LANDSCAPE mode is best</p>
                     <p v-if="touchScreen.enabled">Use the 2 joysticks..</p>
                     <p v-else>Use the WASD keys.</p>
                     <p>Land safely.</p>
