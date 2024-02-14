@@ -4044,72 +4044,21 @@ const __vite_glob_0_11 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.de
   __proto__: null,
   default: _sfc_main$b
 }, Symbol.toStringTag, { value: "Module" }));
-class Ship {
-  constructor(position, vector, acceleration) {
-    this.thrust = 2;
-    this.radius = 16;
-    this.legs = 20;
-    this.angle = 0;
-    this.position = position;
-    this.vector = vector;
-    this.acceleration = acceleration;
-  }
-  revolve(sketch, input) {
-    if (input.x !== 0)
-      this.angle += sketch.deltaTime / 1e3 * input.x;
-  }
-  draw(sketch, input) {
-    sketch.push();
-    sketch.translate(this.position.x, this.position.y);
-    sketch.rotate(this.angle);
-    sketch.fill(0);
-    sketch.stroke(255);
-    sketch.strokeWeight(1);
-    sketch.beginShape();
-    const extra = sketch.QUARTER_PI / 2;
-    sketch.vertex(sketch.sin(sketch.QUARTER_PI - extra) * this.radius, sketch.cos(sketch.QUARTER_PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.HALF_PI - extra) * this.radius, sketch.cos(sketch.HALF_PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.HALF_PI + sketch.QUARTER_PI - extra) * this.radius, sketch.cos(sketch.HALF_PI + sketch.QUARTER_PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.PI - extra) * this.radius, sketch.cos(sketch.PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.PI + sketch.QUARTER_PI - extra) * this.radius, sketch.cos(sketch.PI + sketch.QUARTER_PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.PI + sketch.HALF_PI - extra) * this.radius, sketch.cos(sketch.PI + sketch.HALF_PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.TWO_PI - sketch.QUARTER_PI - extra) * this.radius, sketch.cos(sketch.TWO_PI - sketch.QUARTER_PI - extra) * this.radius);
-    sketch.vertex(sketch.sin(sketch.TWO_PI - extra) * this.radius, sketch.cos(sketch.TWO_PI - extra) * this.radius);
-    sketch.endShape(sketch.CLOSE);
-    sketch.beginShape();
-    sketch.vertex(-this.radius, this.radius);
-    sketch.vertex(-this.radius, this.radius + 5);
-    sketch.vertex(this.radius, this.radius + 5);
-    sketch.vertex(this.radius, this.radius);
-    sketch.endShape(sketch.CLOSE);
-    sketch.beginShape();
-    sketch.vertex(-this.radius / 2, this.radius);
-    sketch.vertex(-this.radius, this.radius + this.legs);
-    sketch.vertex(-this.radius - 10, this.radius + this.legs);
-    sketch.vertex(-this.radius / 2 - 10, this.radius);
-    sketch.endShape(sketch.CLOSE);
-    sketch.beginShape();
-    sketch.vertex(this.radius / 2, this.radius);
-    sketch.vertex(this.radius, this.radius + this.legs);
-    sketch.vertex(this.radius + 10, this.radius + this.legs);
-    sketch.vertex(this.radius / 2 + 10, this.radius);
-    sketch.endShape(sketch.CLOSE);
-    if (input.y !== 0)
-      this.drawFlame(sketch);
-    sketch.pop();
-  }
-  drawFlame(sketch) {
-    sketch.beginShape();
-    sketch.vertex(-this.radius / 2, this.radius);
-    sketch.vertex(0, this.radius * 4);
-    sketch.vertex(this.radius / 2, this.radius);
-    sketch.endShape(sketch.CLOSE);
-  }
-}
 const _sfc_main$a = /* @__PURE__ */ defineComponent({
   __name: "Index",
   __ssrInlineRender: true,
   setup(__props) {
+    const touchScreen = reactive({
+      enabled: false,
+      joystick1: null,
+      element1: "zone_joystick1",
+      angle1: 0,
+      force1: 0,
+      joystick2: null,
+      element2: "zone_joystick2",
+      angle2: 0,
+      force2: 0
+    });
     const arena = reactive({
       width: 800,
       height: 800,
@@ -4117,7 +4066,6 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
       playing: false,
       gravity: 1
     });
-    let me;
     new P5((sketch) => {
       sketch.setup = () => sketchSetup(sketch);
       sketch.draw = () => sketchDraw(sketch);
@@ -4126,53 +4074,13 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
     function sketchSetup(sketch) {
       sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
       sketch.frameRate(arena.frameRate);
-      start();
     }
     function sketchDraw(sketch) {
       sketch.background(20);
       drawArena(sketch);
-      if (me)
-        processMe(sketch);
     }
     function sketchWindowResized(sketch) {
       sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
-    }
-    function processMe(sketch) {
-      const input = captureKeys(sketch);
-      addForces(sketch, input);
-      revolveMe(sketch, input);
-      moveMe(sketch, input);
-      drawMe(sketch, input);
-    }
-    function addForces(sketch, input) {
-      addThrust(sketch, input);
-      addGravity(sketch);
-    }
-    function addThrust(sketch, input) {
-      if (input.y !== 0)
-        me.acceleration.add(
-          sketch.createVector(
-            sketch.sin(me.angle) * me.thrust,
-            -sketch.cos(me.angle) * me.thrust
-          ).mult(sketch.deltaTime / 1e3)
-        );
-    }
-    function addGravity(sketch) {
-      const gravity = sketch.createVector(0, arena.gravity).mult(sketch.deltaTime / 1e3);
-      me.acceleration.add(gravity);
-    }
-    function revolveMe(sketch, input) {
-      me.revolve(sketch, input);
-    }
-    function moveMe(sketch, input) {
-      me.position.add(me.vector);
-      me.vector.add(me.acceleration);
-      me.acceleration = sketch.createVector(0, 0);
-      me.revolve(sketch, input);
-      if (me.position.y + me.radius + me.legs > arena.height) {
-        me.position.y = arena.height - me.radius - me.legs;
-        me.vector = sketch.createVector(0, 0);
-      }
     }
     function drawArena(sketch) {
       sketch.fill(10);
@@ -4185,35 +4093,18 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
         }
       }
     }
-    function drawMe(sketch, input) {
-      me.draw(sketch, input);
-    }
-    function captureKeys(sketch) {
-      let x = 0;
-      let y = 0;
-      if (sketch.keyIsDown(65))
-        x = -1;
-      if (sketch.keyIsDown(68))
-        x = 1;
-      if (sketch.keyIsDown(87))
-        y = -1;
-      if (sketch.keyIsDown(83))
-        y = 1;
-      return sketch.createVector(x, y);
-    }
-    function start() {
-      me = reactive(new Ship(
-        new P5.Vector(400, 400),
-        new P5.Vector(0, 0),
-        new P5.Vector(0, 0)
-      ));
-    }
     return (_ctx, _push, _parent, _attrs) => {
       _push(`<!--[-->`);
       _push(ssrRenderComponent(unref(Head), { title: "Lunar Lander" }, null, _parent));
-      _push(`<div class="w-screen flex flex-row justify-between items-start z-20" data-v-3563d4c8>`);
-      if (unref(me)) {
-        _push(`<div class="absolute top-0 left-0 right-0 bg-white bg-opacity-40 p-2 flex-grow text-xl" data-v-3563d4c8><div class="flex justify-between w-full" data-v-3563d4c8><div data-v-3563d4c8>Position</div><div class="font-bold" data-v-3563d4c8>${ssrInterpolate(unref(me).position)}</div></div><div class="flex justify-between w-full" data-v-3563d4c8><div data-v-3563d4c8>Vector</div><div class="font-bold" data-v-3563d4c8>${ssrInterpolate(unref(me).vector)}</div></div><div class="flex justify-between w-full" data-v-3563d4c8><div data-v-3563d4c8>Acceleration</div><div class="font-bold" data-v-3563d4c8>${ssrInterpolate(unref(me).acceleration)}</div></div><div class="flex justify-between w-full" data-v-3563d4c8><div data-v-3563d4c8>Angle</div><div class="font-bold" data-v-3563d4c8>${ssrInterpolate(unref(me).angle)}</div></div></div>`);
+      _push(`<div class="absolute h-screen w-screen inset-0 flex flex-col justify-center items-center z-20">`);
+      if (!arena.playing) {
+        _push(`<div class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-8 z-30"><div class="text-center"><p>LANDSCAPE mode is best</p>`);
+        if (touchScreen.enabled) {
+          _push(`<p>Use the 2 joysticks..</p>`);
+        } else {
+          _push(`<p>Use the WASD keys.</p>`);
+        }
+        _push(`<p>Land safely.</p></div><div class="w-full flex justify-around my-4"><button class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Start</button></div><a class="underline" href="/">Home</a><a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/LunarLander//Index.vue">Source Code</a></div>`);
       } else {
         _push(`<!---->`);
       }
@@ -4227,10 +4118,9 @@ _sfc_main$a.setup = (props, ctx) => {
   (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("resources/js/Pages/LunarLander/Index.vue");
   return _sfc_setup$a ? _sfc_setup$a(props, ctx) : void 0;
 };
-const Index = /* @__PURE__ */ _export_sfc(_sfc_main$a, [["__scopeId", "data-v-3563d4c8"]]);
 const __vite_glob_0_12 = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  default: Index
+  default: _sfc_main$a
 }, Symbol.toStringTag, { value: "Module" }));
 const _sfc_main$9 = {
   __name: "PrivacyPolicy",

@@ -8,6 +8,7 @@ export type TShip = {
     radius: number,
     legs: number,
     angle: number,
+    fuel: number,
 
     draw(sketch: P5, input: P5.Vector): void,
     revolve(sketch: P5, input: P5.Vector): void

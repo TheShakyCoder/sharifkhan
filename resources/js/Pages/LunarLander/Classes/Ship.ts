@@ -8,6 +8,7 @@ export class Ship {
     radius = 16
     legs = 20
     angle = 0
+    fuel = 100
 
     constructor(position: P5.Vector, vector: P5.Vector, acceleration: P5.Vector) {
         this.position = position
