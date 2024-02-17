@@ -4066,6 +4066,14 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
       playing: false,
       gravity: 1
     });
+    const blueprint = reactive({
+      minWidth: 50,
+      maxWidth: 120,
+      minHeight: 200,
+      maxHeight: 600
+    });
+    const buildings = ref([]);
+    let me;
     new P5((sketch) => {
       sketch.setup = () => sketchSetup(sketch);
       sketch.draw = () => sketchDraw(sketch);
@@ -4076,13 +4084,30 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
       sketch.frameRate(arena.frameRate);
     }
     function sketchDraw(sketch) {
+      if (buildings.value.length === 0)
+        createBuildings(sketch);
       sketch.background(20);
       drawArena(sketch);
+      drawBuildings(sketch);
     }
     function sketchWindowResized(sketch) {
       sketch.resizeCanvas(sketch.windowWidth, sketch.windowHeight);
     }
+    function createBuildings(sketch) {
+      buildings.value.splice(0, buildings.value.length);
+      let remainingWidth = arena.width;
+      while (remainingWidth > blueprint.maxWidth) {
+        const w = sketch.random(blueprint.minWidth, blueprint.maxWidth);
+        const h2 = sketch.random(blueprint.minHeight, blueprint.maxHeight);
+        const x = arena.width - remainingWidth;
+        const y = arena.height - h2;
+        buildings.value.push({ x, y, w, h: h2 });
+        remainingWidth -= w;
+      }
+    }
     function drawArena(sketch) {
+      sketch.stroke(128);
+      sketch.strokeWeight(1);
       sketch.fill(10);
       sketch.rect(0, 0, arena.width, arena.height);
       sketch.stroke(100);
@@ -4093,18 +4118,42 @@ const _sfc_main$a = /* @__PURE__ */ defineComponent({
         }
       }
     }
+    function drawBuildings(sketch) {
+      let startX = 0;
+      sketch.strokeWeight(1);
+      for (let b = 0; b < buildings.value.length; b++) {
+        const building = buildings.value[b];
+        sketch.rect(startX, arena.height - building.h, building.w, building.h);
+        startX += building.w;
+      }
+    }
     return (_ctx, _push, _parent, _attrs) => {
       _push(`<!--[-->`);
       _push(ssrRenderComponent(unref(Head), { title: "Lunar Lander" }, null, _parent));
       _push(`<div class="absolute h-screen w-screen inset-0 flex flex-col justify-center items-center z-20">`);
       if (!arena.playing) {
-        _push(`<div class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-8 z-30"><div class="text-center"><p>LANDSCAPE mode is best</p>`);
+        _push(`<div class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-8 z-30"><div class="text-center">`);
+        if (touchScreen.enabled) {
+          _push(`<p>LANDSCAPE mode is best</p>`);
+        } else {
+          _push(`<!---->`);
+        }
         if (touchScreen.enabled) {
           _push(`<p>Use the 2 joysticks..</p>`);
         } else {
+          _push(`<!---->`);
+        }
+        if (unref(me) && unref(me).hasCrashed) {
+          _push(`<p class="bg-red-600 text-white p-2">CRASHED</p>`);
+        } else {
+          _push(`<!---->`);
+        }
+        if (unref(me) && unref(me).hasLanded) {
+          _push(`<p class="bg-green-600 text-white p-2">LANDED</p>`);
+        } else {
           _push(`<p>Use the WASD keys.</p>`);
         }
-        _push(`<p>Land safely.</p></div><div class="w-full flex justify-around my-4"><button class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Start</button></div><a class="underline" href="/">Home</a><a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/LunarLander//Index.vue">Source Code</a></div>`);
+        _push(`<p>Land on a building safely.</p></div><div class="w-full flex justify-around my-4"><button class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Start</button></div><a class="underline" href="/">Home</a><a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/LunarLander//Index.vue">Source Code</a></div>`);
       } else {
         _push(`<!---->`);
       }

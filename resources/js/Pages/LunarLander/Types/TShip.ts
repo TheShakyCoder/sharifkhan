@@ -6,10 +6,14 @@ export type TShip = {
     acceleration: P5.Vector,
     thrust: number,
     radius: number,
-    legs: number,
+    legHeight: number,
+    legWidth: number,
     angle: number,
     fuel: number,
+    hasCrashed: boolean,
+    hasLanded: boolean,
 
-    draw(sketch: P5, input: P5.Vector): void,
+    draw(sketch: P5): void,
+    drawFlame(sketch: P5): void,
     revolve(sketch: P5, input: P5.Vector): void
 }
