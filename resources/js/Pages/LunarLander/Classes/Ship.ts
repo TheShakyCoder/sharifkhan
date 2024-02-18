@@ -12,6 +12,7 @@ export class Ship {
     fuel = 100
     hasCrashed = false
     hasLanded = false
+    score = 0
 
     constructor(position: P5.Vector, vector: P5.Vector, acceleration: P5.Vector) {
         this.position = position
@@ -77,6 +78,7 @@ export class Ship {
         sketch.rotate(this.angle)
         sketch.strokeWeight(1)
         sketch.stroke(255)
+        sketch.noFill()
         sketch.beginShape()
         sketch.vertex(-this.radius / 2, this.radius)
         sketch.vertex(0, this.radius * 6)

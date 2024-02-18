@@ -12,6 +12,7 @@ export type TShip = {
     fuel: number,
     hasCrashed: boolean,
     hasLanded: boolean,
+    score: number
 
     draw(sketch: P5): void,
     drawFlame(sketch: P5): void,

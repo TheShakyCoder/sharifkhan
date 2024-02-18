@@ -28,7 +28,7 @@ const arena = reactive({
 })
 
 const blueprint = reactive({
-    minWidth: 50,
+    minWidth: 40,
     maxWidth: 120,
     minHeight: 200,
     maxHeight: 600
@@ -69,13 +69,16 @@ function sketchWindowResized(sketch: P5) {
 function createBuildings(sketch: P5) {
     buildings.value.splice(0, buildings.value.length)
     let remainingWidth = arena.width
+    let building
     while(remainingWidth > blueprint.maxWidth) {
         const w = sketch.random(blueprint.minWidth, blueprint.maxWidth)
         const h = sketch.random(blueprint.minHeight, blueprint.maxHeight)
         const x = arena.width - remainingWidth
         const y = arena.height - h
 
-        buildings.value.push({x, y, w, h})
+        building = {x, y, w, h, multiplier: (arena.height - h) / w }
+
+        buildings.value.push(building)
         remainingWidth -= w
     }
 
@@ -92,6 +95,19 @@ function processMe(sketch: P5) {
     }
 
     drawMe(sketch)
+    drawStats(sketch)
+}
+
+function drawStats(sketch: P5) {
+    sketch.textSize(14)
+    sketch.textAlign(sketch.LEFT)
+    sketch.text('x: ' + me.position.x.toFixed(0), arena.width - 100, 50)
+    sketch.text('y: ' + me.position.y.toFixed(0), arena.width - 100, 70)
+
+    sketch.text('vx: ' + me.vector.x.toFixed(2), arena.width - 200, 50)
+    sketch.text('vy: ' + me.vector.y.toFixed(2), arena.width - 200, 70)
+    sketch.text('vm: ' + me.vector.mag().toFixed(2), arena.width - 200, 90)
+    sketch.text('a: ' + (me.angle * 57.2958).toFixed(0), arena.width - 200, 110)
 }
 
 function addForces(sketch: P5, input: P5.Vector) {
@@ -124,6 +140,10 @@ function moveMe(sketch: P5, input: P5.Vector) {
     me.acceleration = sketch.createVector(0,0)
     me.revolve(sketch, input)
 
+    //  HIT A WALL
+    if(me.position.x + me.radius > arena.width || me.position.x - me.radius < 0)
+        crash(sketch)
+
     //  HIT THE GROUND
     if(me.position.y + me.radius + me.legHeight > arena.height) {
         if(isCrash(sketch))
@@ -154,6 +174,7 @@ function touchedBuilding(sketch: P5) {
                     return
                 } else {
                     me.hasLanded = true
+                    me.score = (building.multiplier * 100)
                     return
                 }
             }
@@ -173,13 +194,13 @@ function drawArena(sketch: P5) {
     sketch.fill(10)
     sketch.rect(0, 0, arena.width, arena.height)
 
-    sketch.stroke(100)
-    sketch.strokeWeight(4)
-    for(let x = 100; x < arena.width; x = x + 100) {
-        for(let y = 100; y < arena.height; y = y + 100) {
-            sketch.point(x, y)
-        }
-    }
+    // sketch.stroke(100)
+    // sketch.strokeWeight(4)
+    // for(let x = 100; x < arena.width; x = x + 100) {
+    //     for(let y = 100; y < arena.height; y = y + 100) {
+    //         sketch.point(x, y)
+    //     }
+    // }
 }
 
 function drawBuildings(sketch: P5) {
@@ -187,7 +208,13 @@ function drawBuildings(sketch: P5) {
     sketch.strokeWeight(1)
     for(let b = 0; b < buildings.value.length; b++) {
         const building = buildings.value[b]
-        sketch.rect(startX, arena.height - building.h, building.w, building.h)
+        sketch.noFill()
+        sketch.rect(startX, building.y, building.w, building.h)
+
+        sketch.textAlign(sketch.CENTER, sketch.TOP)
+        sketch.textSize(24)
+        sketch.fill(130)
+        sketch.text((building.multiplier * 100).toFixed(0), building.x + (building.w / 2), building.y + 15)
         startX += building.w
     }
 }
@@ -211,13 +238,13 @@ function captureKeys(sketch: P5): P5.Vector {
 }
 
 function isCrash(sketch: P5) {
-    return me.angle > sketch.QUARTER_PI / 2 || me.angle < -sketch.QUARTER_PI / 2 || me.vector.mag() > 2
+    return me.angle > sketch.QUARTER_PI / 2 || me.angle < -sketch.QUARTER_PI / 2 || me.vector.mag() > 1.5
 }
 
 function start() {
     me = reactive(new Ship(
         new P5.Vector(50, 50),
-        new P5.Vector(1, 0),
+        new P5.Vector(Math.random() + 0.5, 0),
         new P5.Vector(0, 0),
     ))
     buildings.value = []
@@ -256,6 +283,7 @@ function end(sketch: P5) {
                     <p v-if="touchScreen.enabled">Use the 2 joysticks..</p>
                     <p v-if="me && me.hasCrashed" class="bg-red-600 text-white p-2">CRASHED</p>
                     <p v-if="me && me.hasLanded" class="bg-green-600 text-white p-2">LANDED</p>
+                    <p v-if="me && me.hasLanded" class="p-2">You scored {{ me.score.toFixed(0) }} points.</p>
                     <p v-else>Use the WASD keys.</p>
                     <p>Land on a building safely.</p>
                 </div>
