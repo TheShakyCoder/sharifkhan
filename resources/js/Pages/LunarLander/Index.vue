@@ -4,8 +4,9 @@ import P5 from "p5";
 import {Ref,ref,reactive} from "vue";
 import {TShip} from "./Types/TShip";
 import {Ship} from './Classes/Ship'
+import {ITouchScreen} from "../Asteroids/Interfaces/ITouchScreen";
 
-const touchScreen = reactive({
+const touchScreen: ITouchScreen = reactive({
     enabled: false,
 
     joystick1: null,
@@ -193,14 +194,6 @@ function drawArena(sketch: P5) {
     sketch.strokeWeight(1)
     sketch.fill(10)
     sketch.rect(0, 0, arena.width, arena.height)
-
-    // sketch.stroke(100)
-    // sketch.strokeWeight(4)
-    // for(let x = 100; x < arena.width; x = x + 100) {
-    //     for(let y = 100; y < arena.height; y = y + 100) {
-    //         sketch.point(x, y)
-    //     }
-    // }
 }
 
 function drawBuildings(sketch: P5) {
@@ -265,7 +258,7 @@ function end(sketch: P5) {
 <template>
     <Head title="Lunar Lander" />
 
-    <div class="absolute h-screen w-screen inset-0 flex flex-col justify-center items-center z-20">
+    <div class="absolute inset-0 flex flex-col justify-center items-center z-20">
         <transition
             enter-active-class="duration-150 ease-out"
             enter-from-class="opacity-0 scale-95"
@@ -276,7 +269,7 @@ function end(sketch: P5) {
         >
             <div
                 v-if="!arena.playing"
-                class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-8 z-30"
+                class="flex flex-col justify-center items-center bg-white bg-opacity-80 rounded-xl w-60 text-black py-12 z-30"
             >
                 <div class="text-center">
                     <p v-if="touchScreen.enabled">LANDSCAPE mode is best</p>
@@ -287,40 +280,38 @@ function end(sketch: P5) {
                     <p v-else>Use the WASD keys.</p>
                     <p>Land on a building safely.</p>
                 </div>
-<!--                <div v-else>-->
-<!--                    <div class="text-center ">You got to level</div>-->
-<!--&lt;!&ndash;                    <div class="text-center text-7xl font-bold">{{ arena.asteroidCount }}</div>&ndash;&gt;-->
-<!--                </div>-->
                 <div class="w-full flex justify-around my-4">
                     <button @click="start" class="w-20 p-2 px-3 rounded-2xl bg-green-600 text-white font-bold">Start</button>
                 </div>
                 <a class="underline" href="/">Home</a>
-                <a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/LunarLander//Index.vue">Source Code</a>
+                <a class="underline" href="https://bitbucket.org/FigLimited/sharifkhan/src/main/resources/js/Pages/LunarLander/Index.vue">Source Code</a>
             </div>
         </transition>
     </div>
 
-<!--    <div class="w-screen flex flex-row justify-between items-start">-->
+    <div class="w-screen flex flex-row justify-between items-start">
 
-<!--        <div class="w-0 h-screen z-20" :id="touchScreen.element1"></div>-->
+        <div class="w-0 h-screen z-20" :id="touchScreen.element1"></div>
 
-<!--        <div class="bg-white bg-opacity-40 z-10 p-2 flex-grow text-xl">-->
-<!--            <div class="flex justify-between w-40">-->
-<!--                <div>Frame Rate</div>-->
-<!--                <div class="font-bold">{{ Math.round(arena.frameRate) }}</div>-->
-<!--            </div>-->
-<!--            <div v-if="me" class="flex justify-between w-40">-->
-<!--                <div>Fuel</div>-->
-<!--                <div class="font-bold">{{ Math.round(me.fuel) }}</div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <div class="bg-white bg-opacity-40 z-10 p-2 flex-grow text-xl">
+            <div class="flex justify-between w-40">
+                <div>Score</div>
+                <div class="font-bold">{{ arena.width }}</div>
+            </div>
+            <div class="flex justify-between w-40">
+                <div>Frame Rate</div>
+                <div class="font-bold">{{ Math.round(arena.frameRate) }}</div>
+            </div>
+        </div>
 
-<!--        <div class="w-0 h-screen z-20" :id="touchScreen.element2"></div>-->
+        <div class="w-0 h-screen z-20" :id="touchScreen.element2"></div>
 
-<!--    </div>-->
+    </div>
 
 </template>
 
 <style scoped>
-
+.p5Canvas {
+    @apply absolute inset-0 z-0
+}
 </style>

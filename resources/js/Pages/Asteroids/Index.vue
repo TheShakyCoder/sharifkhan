@@ -339,22 +339,6 @@ function end() {
         <div class="w-0 h-screen z-20" :id="touchScreen.element2"></div>
 
     </div>
-<!--    <div class="h-screen flex flex-col justify-between w-full">-->
-<!--        <div class="bg-white bg-opacity-40 z-10 p-2">-->
-<!--            <div class="flex justify-between">-->
-<!--                <div>Score</div>-->
-<!--                <div>{{ arena.asteroidCount }}</div>-->
-<!--            </div>-->
-<!--            <div class="flex justify-between">-->
-<!--                <div>Frame Rate</div>-->
-<!--                <div>{{ Math.round(arena.frameRate) }}</div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="flex bg-red-500  h-32 z-10" :class="[touchScreen.enabled ? 'bg-opacity-40' : 'bg-opacity-0']">-->
-<!--            <div class="w-1/2" :id="touchScreen.element1"></div>-->
-<!--            <div class="w-1/2" :id="touchScreen.element2"></div>-->
-<!--        </div>-->
-<!--    </div>-->
 
 </template>
 

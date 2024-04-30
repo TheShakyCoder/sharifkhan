@@ -17,33 +17,32 @@ defineProps({
             <Link :href="route('dodge')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dodge</Link>
             <Link :href="route('asteroids')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Asteroids</Link>
             <Link :href="route('lander')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Lunar Lander</Link>
-<!--            <Link v-if="$page.props.auth.user" :href="route('dashboard')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dashboard</Link>-->
-
-<!--            <template v-else>-->
-<!--                <Link :href="route('login')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Log in</Link>-->
-
-<!--                <Link v-if="canRegister" :href="route('register')" class="ms-4 font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Register</Link>-->
-<!--            </template>-->
         </div>
 
-        <div class="max-w-7xl mx-auto p-6 lg:p-8 dark:text-white flex flex-col justify-around">
-            <div>
-                <ul class="list-disc text-7xl">
-                    <li>Good</li>
-                    <li>Fast</li>
-                    <li>Cheap</li>
-                    <li>Done</li>
-                </ul>
-
-                <div class="text-xl">Pick any 3</div>
+        <div class="max-w-7xl text-xl mx-auto p-6 lg:p-8 dark:text-gray-200 flex flex-col justify-around">
+            <div class="flex flex-col">
+                <h1>Sharif Khan</h1>
+                <h2 class="font-bold text-2xl">UK Based Laravel contractor</h2>
+                <a class="underline underline-offset-4" href="https://www.linkedin.com/in/shaky-coder/">LinkedIn profile</a>
+                <a class="underline underline-offset-4" href="https://www.youtube.com/@theshakycoder">YouTube Channel</a>
             </div>
-
-            <div class="mt-24">
-                <p>Sharif Khan</p>
-                <p>UK Based Laravel contractor</p>
-                <a class="underline" href="https://www.linkedin.com/in/shaky-coder/">LinkedIn profile</a>
+            <div class="flex flex-col mt-12">
+                <h2 class="font-bold text-2xl">Specialties</h2>
+                <div>inertia.js</div>
+                <div>vue.js</div>
+                <div>web apps</div>
+                <div>web portals</div>
             </div>
-
+            <div class="flex flex-col mt-12">
+                <h2 class="font-bold text-2xl">Concept Sites</h2>
+                <div><a class="underline underline-offset-4" href="https://dev.stupidly.uk">Stupidly</a> Bookkeeping App</div>
+            </div>
+            <div class="flex flex-col mt-12">
+                <h2 class="font-bold text-2xl">Games</h2>
+                <div><a class="underline underline-offset-4" href="/dodge">Dodge</a> (first attempt)</div>
+                <div><a class="underline underline-offset-4" href="/asteroids">Asteroids</a> (my take on an old classic)</div>
+<!--                <div><a class="underline underline-offset-4" href="/lander">Lunar Lander</a> (desktop only, no touchscreen)</div>-->
+            </div>
         </div>
     </div>
 </template>
