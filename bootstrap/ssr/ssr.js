@@ -3797,12 +3797,10 @@ const _sfc_main$d = /* @__PURE__ */ defineComponent({
   setup(__props) {
     const touchScreen = ref(false);
     let joystick = null;
-    const joystickMovement = reactive({
+    reactive({
       x: 0,
       y: 0
     });
-    let nippleAngle = null;
-    let nippleForce = 0;
     onMounted(() => {
       if (window.matchMedia("(pointer: coarse)").matches)
         touchScreen.value = true;
@@ -3812,12 +3810,10 @@ const _sfc_main$d = /* @__PURE__ */ defineComponent({
         restJoystick: true
       });
       joystick.on("move", function(evt, data) {
-        nippleAngle = data.angle.radian;
-        nippleForce = Math.min(1, data.force);
+        data.angle.radian;
+        Math.min(1, data.force);
       });
       joystick.on("end", function(evt, data) {
-        nippleAngle = null;
-        nippleForce = 0;
       });
     });
     const arena = {
@@ -3832,23 +3828,7 @@ const _sfc_main$d = /* @__PURE__ */ defineComponent({
     const asteroidCount = ref(0);
     const frameRate = ref(33);
     const delta = ref(0);
-    const shipMode = ref("dodge");
-    const shipTypes = [
-      {
-        name: "dodge",
-        speed: 60,
-        radius: 20,
-        shieldRadius: 1,
-        life: 2
-      },
-      {
-        name: "shield",
-        speed: 50,
-        radius: 25,
-        shieldRadius: 50,
-        life: 2
-      }
-    ];
+    ref("dodge");
     let weaponCharged = true;
     let me;
     const playing = ref(false);
@@ -3868,7 +3848,6 @@ const _sfc_main$d = /* @__PURE__ */ defineComponent({
         sketch.translate(-arena.width / 2, -arena.height / 2);
         drawArena(sketch);
         processAsteroids(sketch, asteroids.value);
-        processMe(sketch, me);
         sketch.pop();
       };
     });
@@ -3919,30 +3898,6 @@ const _sfc_main$d = /* @__PURE__ */ defineComponent({
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
       sketch.text(asteroid.name, asteroid.position.x, asteroid.position.y);
     }
-    function processMe(sketch, me2) {
-      if (!me2)
-        return;
-      if (weaponCharged)
-        sketch.fill(0, 180, 0);
-      else
-        sketch.fill(255, 0, 0);
-      sketch.noStroke();
-      sketch.circle(me2.position.x, me2.position.y, me2.radius * 2);
-      sketch.noFill();
-      if (weaponCharged)
-        sketch.stroke(0, 180, 0);
-      else
-        sketch.stroke(255, 0, 0);
-      sketch.strokeWeight(1);
-      sketch.circle(me2.position.x, me2.position.y, me2.shieldRadius * 2);
-      sketch.fill(255);
-      sketch.textSize(20);
-      sketch.textStyle(sketch.BOLD);
-      sketch.textAlign(sketch.CENTER, sketch.CENTER);
-      sketch.noStroke();
-      sketch.text(asteroidCount.value.toString(), me2.position.x, me2.position.y);
-      captureMovement(sketch);
-    }
     function checkShield(asteroid) {
       const zSquared = (asteroid.radius + me.shieldRadius) * (asteroid.radius + me.shieldRadius);
       return asteroid.distanceSquared < zSquared;
@@ -3956,35 +3911,6 @@ const _sfc_main$d = /* @__PURE__ */ defineComponent({
     }
     function end() {
       playing.value = false;
-    }
-    function captureMovement(sketch) {
-      let movement = { ...joystickMovement };
-      let vector;
-      if (sketch.keyIsDown(65))
-        movement.x = -1;
-      if (sketch.keyIsDown(68))
-        movement.x = 1;
-      if (sketch.keyIsDown(87))
-        movement.y = -1;
-      if (sketch.keyIsDown(83))
-        movement.y = 1;
-      const shipType = shipTypes.filter((ship) => ship.name === shipMode.value)[0];
-      if (nippleAngle)
-        vector = sketch.createVector(
-          sketch.cos(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1e3,
-          -sketch.sin(nippleAngle) * nippleForce * sketch.deltaTime * shipType.speed / 1e3
-        );
-      else
-        vector = sketch.createVector(
-          movement.x * sketch.deltaTime * shipType.speed / 1e3,
-          movement.y * sketch.deltaTime * shipType.speed / 1e3
-        );
-      if (playing.value)
-        me.position.add(vector);
-      me.position.x = sketch.min(me.position.x, arena.width);
-      me.position.y = sketch.min(me.position.y, arena.height);
-      me.position.x = sketch.max(me.position.x, 0);
-      me.position.y = sketch.max(me.position.y, 0);
     }
     function createAsteroid(sketch) {
       if (!playing.value || asteroidCount.value > maxAsteroids)
