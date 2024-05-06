@@ -34,17 +34,17 @@
                         </li>
                         <li>
                             <div class="flex justify-between items-end text-xl font-bold">
-                                <h2>Vue.js</h2>
+                                <h2>Yahtzee Clone</h2>
                                 <div class="text-sm uppercase">Novice</div>
                             </div>
-                            <p>Learn how to use logic and data to build a dice-rolling app.</p>
+                            <p>Learn how to use logic and data to build a dice-rolling game.</p>
                         </li>
                         <li>
                             <div class="flex justify-between items-end text-xl font-bold">
-                                <h2>p5.js</h2>
+                                <h2>Asteroids Clone</h2>
                                 <div class="text-sm uppercase">Intermediate</div>
                             </div>
-                            <p>Learn how to use the Canvas element to build a snake.io clone.</p>
+                            <p>Learn how to use the Canvas element to build a classic game.</p>
                         </li>
                     </ul>
                 </div>
