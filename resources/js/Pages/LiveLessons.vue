@@ -1,6 +1,7 @@
 <template>
     <Head title="Online Coding Lessons" />
-    <div class="relative isolate bg-gray-900 h-full">
+    <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
+
         <div class="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2">
 
             <div class="relative px-6 pb-20 pt-24 sm:pt-32 lg:static lg:px-8 lg:py-48">
@@ -24,7 +25,7 @@
                     <h2 class="text-3xl font-bold tracking-tight text-white">Live Online Classes</h2>
                     <p class="mt-6 text-lg leading-8 text-gray-300">These classes are ideal for home-taught children who would benefit from a basic grounding in web coding. There is a maximum of 6 students to a class and prices start at £5 per lesson.</p>
                     <p class="mt-6 text-lg leading-8 text-gray-300">Here are the current lessons available:</p>
-                    <ul class="mt-10 space-y-4 text-base leading-7 text-gray-300 ">
+                    <ul class="mt-10 space-y-8 text-base leading-7 text-gray-300 ">
                         <li>
                             <div class="flex justify-between items-end text-xl font-bold">
                                 <h2>HTML & CSS</h2>
@@ -70,7 +71,7 @@
                         </div>
                     </div>
                     <h2 class="text-3xl font-bold tracking-tight text-white">Get in touch</h2>
-                    <p class="mt-6 text-lg leading-8 text-gray-300">To find out more or to book a place please contact me.</p>
+                    <p class="mt-6 text-lg leading-8 text-gray-300">To find out more please contact me or join a classroom.</p>
                     <dl class="mt-10 space-y-4 text-base leading-7 text-gray-300">
                         <div class="flex gap-x-4">
                             <dt class="flex-none">
