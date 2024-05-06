@@ -24,6 +24,10 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/live-lessons', function () {
+    return Inertia::render('LiveLessons');
+});
+
 Route::get('/dodge', function () {
     return Inertia::render('Dodge/Index');
 })->name('dodge');

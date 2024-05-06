@@ -13,11 +13,11 @@ defineProps({
     <Head title="UK Laravel Contractor" />
 
     <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-        <div v-if="canLogin" class="sm:fixed sm:top-0 sm:end-0 p-6 text-end z-10 space-x-4">
-            <Link :href="route('dodge')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dodge</Link>
-            <Link :href="route('asteroids')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Asteroids</Link>
-            <Link :href="route('lander')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Lunar Lander</Link>
-        </div>
+<!--        <div v-if="canLogin" class="sm:fixed sm:top-0 sm:end-0 p-6 text-end z-10 space-x-4">-->
+<!--            <Link :href="route('dodge')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dodge</Link>-->
+<!--            <Link :href="route('asteroids')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Asteroids</Link>-->
+<!--            <Link :href="route('lander')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Lunar Lander</Link>-->
+<!--        </div>-->
 
         <div class="max-w-7xl text-xl mx-auto p-6 lg:p-8 dark:text-gray-200 flex flex-col justify-around">
             <div class="flex flex-col">
@@ -42,6 +42,10 @@ defineProps({
                 <div><a class="underline underline-offset-4" href="/dodge">Dodge</a> (first attempt)</div>
                 <div><a class="underline underline-offset-4" href="/asteroids">Asteroids</a> (my take on an old classic)</div>
 <!--                <div><a class="underline underline-offset-4" href="/lander">Lunar Lander</a> (desktop only, no touchscreen)</div>-->
+            </div>
+            <div class="flex flex-col mt-12">
+                <h2 class="font-bold text-2xl">Online Training</h2>
+                <div><a class="underline underline-offset-4" href="/live-lessons">Live Lessons</a></div>
             </div>
         </div>
     </div>
