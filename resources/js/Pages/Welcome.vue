@@ -13,25 +13,20 @@ defineProps({
     <Head title="UK Laravel Contractor" />
 
     <div class="relative sm:flex sm:justify-center sm:items-center min-h-screen bg-dots-darker bg-center bg-gray-100 dark:bg-dots-lighter dark:bg-gray-900 selection:bg-red-500 selection:text-white">
-<!--        <div v-if="canLogin" class="sm:fixed sm:top-0 sm:end-0 p-6 text-end z-10 space-x-4">-->
-<!--            <Link :href="route('dodge')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Dodge</Link>-->
-<!--            <Link :href="route('asteroids')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Asteroids</Link>-->
-<!--            <Link :href="route('lander')" class="font-semibold text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline focus:outline-2 focus:rounded-sm focus:outline-red-500">Lunar Lander</Link>-->
-<!--        </div>-->
 
         <div class="max-w-7xl text-xl mx-auto p-6 lg:p-8 dark:text-gray-200 flex flex-col justify-around">
             <div class="flex flex-col">
                 <h1>Sharif Khan</h1>
                 <h2 class="font-bold text-2xl">UK Based Laravel contractor</h2>
+                <p>Specialising in portals and intranets.</p>
                 <a class="underline underline-offset-4" href="https://www.linkedin.com/in/shaky-coder/">LinkedIn profile</a>
                 <a class="underline underline-offset-4" href="https://www.youtube.com/@theshakycoder">YouTube Channel</a>
             </div>
             <div class="flex flex-col mt-12">
                 <h2 class="font-bold text-2xl">Specialties</h2>
+                <div>Laravel</div>
                 <div>inertia.js</div>
                 <div>vue.js</div>
-                <div>web apps</div>
-                <div>web portals</div>
             </div>
             <div class="flex flex-col mt-12">
                 <h2 class="font-bold text-2xl">Concept Sites</h2>
