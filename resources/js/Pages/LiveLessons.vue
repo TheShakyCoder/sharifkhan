@@ -29,9 +29,10 @@
                         <li>
                             <div class="flex justify-between items-end text-xl font-bold">
                                 <h2>HTML & CSS</h2>
-                                <div class="text-sm uppercase">Novice</div>
+                                <div class="text-sm uppercase">Intro</div>
                             </div>
                             <p>Start at the beginning. Learn the fundamentals of website building.</p>
+                            <div>learn: html, css</div>
                         </li>
                         <li>
                             <div class="flex justify-between items-end text-xl font-bold">
@@ -39,6 +40,7 @@
                                 <div class="text-sm uppercase">Novice</div>
                             </div>
                             <p>Learn how to use logic and data to build a dice-rolling game.</p>
+                            <div>learn: vue (javascript), tailwind (css)</div>
                         </li>
                         <li>
                             <div class="flex justify-between items-end text-xl font-bold">
@@ -46,6 +48,15 @@
                                 <div class="text-sm uppercase">Intermediate</div>
                             </div>
                             <p>Learn how to use the Canvas element to build a classic game.</p>
+                            <div>learn: vue (javascript), tailwind (css)</div>
+                        </li>
+                        <li>
+                            <div class="flex justify-between items-end text-xl font-bold">
+                                <h2>Hog dice game</h2>
+                                <div class="text-sm uppercase">Intermediate</div>
+                            </div>
+                            <p>Learn how to use build a game in the computer terminal.</p>
+                            <div>learn: python</div>
                         </li>
                     </ul>
                 </div>
