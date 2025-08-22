@@ -36,6 +36,10 @@ Route::get('/asteroids', function () {
     return Inertia::render('Asteroids/Index');
 })->name('asteroids');
 
+Route::get('/battle-zone', function () {
+    return Inertia::render('BattleZone/Index');
+})->name('battle-zone');
+
 Route::get('/lander', function () {
     return Inertia::render('LunarLander/Index');
 })->name('lander');
