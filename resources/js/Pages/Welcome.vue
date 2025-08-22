@@ -36,7 +36,8 @@ defineProps({
                 <h2 class="font-bold text-2xl">Games</h2>
                 <div><a class="underline underline-offset-4" href="/dodge">Dodge</a> (first attempt)</div>
                 <div><a class="underline underline-offset-4" href="/asteroids">Asteroids</a> (my take on an old classic)</div>
-                <div><a class="underline underline-offset-4" href="https://earth2900.sharifkhan.co.uk/">Earth 2900 (BETA)</a> (homage to Deuteros)</div>
+                <div><a class="underline underline-offset-4" href="/battle-zone">BattleZone</a> (a restomod)</div>
+<!--                <div><a class="underline underline-offset-4" href="https://earth2900.sharifkhan.co.uk/">Earth 2900 (BETA)</a> (homage to Deuteros)</div>-->
 <!--                <div><a class="underline underline-offset-4" href="/lander">Lunar Lander</a> (desktop only, no touchscreen)</div>-->
             </div>
             <div class="flex flex-col mt-12">
