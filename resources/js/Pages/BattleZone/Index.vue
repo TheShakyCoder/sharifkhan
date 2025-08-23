@@ -12,27 +12,27 @@ const minimapCanvas = ref(null)
 const minimap = new MiniMap(minimapCanvas)
 const cameraState = ref('front')
 const grid = [
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
   1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1,
   1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1,
   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
   1, 1, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1,
   1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1,
   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1,
-  1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 
-  1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 
+  1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1,
+  1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1,
   1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
   1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
   1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1,
   1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1,
   1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
   1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1,
-  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 ]
 
 let scene
 let camera
-let renderer 
+let renderer
 let playerMesh
 let floorMesh
 let gridMeshes = []
@@ -57,7 +57,7 @@ function addSunLight() {
   const sunLight = new THREE.DirectionalLight(0xffffff, 1)
   sunLight.position.set(0, 200, 0) // Position above the scene
   sunLight.castShadow = true
-  
+
   // Configure shadow properties
   sunLight.shadow.mapSize.width = gridSize * cubeSize
   sunLight.shadow.mapSize.height = gridSize * cubeSize
@@ -67,9 +67,9 @@ function addSunLight() {
   sunLight.shadow.camera.right = gridSize * cubeSize / 2
   sunLight.shadow.camera.top = gridSize * cubeSize / 2
   sunLight.shadow.camera.bottom = -gridSize * cubeSize / 2
-  
+
   scene.add(sunLight)
-  
+
   // Add a helper to visualize the light (optional, for debugging)
   const helper = new THREE.DirectionalLightHelper(sunLight, 50)
   scene.add(helper)
@@ -79,12 +79,12 @@ function init() {
   // Scene
   scene = new THREE.Scene()
   scene.background = new THREE.Color(0x82DBC5)
-  
+
   // Camera
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
   camera.position.set(playerPos.x + playerSize/2, 64, playerPos.z + playerSize/2)
   camera.rotation.y = playerPos.angle
-  
+
   // Renderer
   renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -100,20 +100,20 @@ function init() {
   floorMesh.position.set(512, -64, 512)
   floorMesh.receiveShadow = true
   scene.add(floorMesh)
-  
+
   // Grid cubes
   for (let i = 0; i < grid.length; i++) {
     if (grid[i] === 1) {
       const cubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
       const cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
       const cube = new THREE.Mesh(cubeGeometry, cubeMaterial)
-      
+
       const x = -gridSize * cubeSize / 4 + ((i % gridSize) * cubeSize + cubeSize / 2)
       const z = -gridSize * cubeSize / 4 + ((Math.floor(i / gridSize)) * cubeSize + cubeSize / 2)
       cube.position.set(x, -32, z)
       cube.castShadow = true
       cube.receiveShadow = true
-      
+
       scene.add(cube)
       gridMeshes.push(cube)
     }
@@ -130,7 +130,7 @@ function init() {
   // Lighting
   const ambientLight = new THREE.AmbientLight(0xffffff, 1)
   scene.add(ambientLight)
-  
+
   addSunLight()
 
   // Handle window resize
@@ -149,7 +149,7 @@ function checkCollision(newX, newZ) {
 function updatePlayer() {
   const speed = 1
   const rotationSpeed = 0.01
-  
+
   if (keys['a']) {
     playerPos.angle += rotationSpeed
   }
@@ -181,19 +181,21 @@ function updatePlayer() {
   if(keys['3']) {
     cameraState.value = 'swivel'
   }
-  
+
   // Update 3D objects
   if (playerMesh) {
     playerMesh.position.set(playerPos.x, -32, playerPos.z)
     playerMesh.rotation.y = playerPos.angle
   }
-  if (camera) { 
+  if (camera) {
     if (cameraState.value === 'front') {
-      camera.position.set(playerPos.x, -32 + playerSize/2, playerPos.z + playerSize/2)
+      camera.position.set(
+        playerPos.x + Math.sin(playerPos.angle) * 100, // 100 behind
+        -0,
+        playerPos.z + Math.cos(playerPos.angle) * 100  // 100 behind
+      )
       camera.rotation.y = playerPos.angle
-      camera.rotation.x = 0
-      camera.rotation.z = 0
-
+      camera.lookAt(playerPos.x, -32, playerPos.z)
     } else if (cameraState.value === 'top') {
       camera.position.set(playerPos.x, 300, playerPos.z)
       camera.lookAt(playerPos.x, 0, playerPos.z)
@@ -203,20 +205,8 @@ function updatePlayer() {
       camera.rotation.z = playerPos.angle
       camera.rotation.y = 0
     }
-    // if(cameraState.value === 'front') {
-    //   camera.position.set(playerPos.x, 0, playerPos.z + playerSize / 2)
-    //   camera.rotation.y = playerPos.angle
-
-    // }
-    // if(cameraState.value === 'top') {
-    //   camera.position.set(playerPos.x, 512, playerPos.z + playerSize / 2)
-    //   camera.rotation.y = playerPos.angle
-    //   camera.lookAt(playerPos.x, 0, playerPos.z)
-    // }
   }
 
-  
-  // drawMinimap()
   minimap.draw(grid, playerPos, cubeSize, gridSize)
 }
 
