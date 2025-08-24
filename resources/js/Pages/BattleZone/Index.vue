@@ -62,7 +62,7 @@ function handleKeyUp(event) {
 // Add this to your init() function after the ambient light
 function addSunLight() {
   // Create directional light (sun)
-  const sunLight = new THREE.DirectionalLight(0xffffff, 1)
+  const sunLight = new THREE.DirectionalLight(0xffffff, 2)
   sunLight.position.set(0, 500, 0) // Position above the scene
   sunLight.castShadow = true
 
@@ -216,7 +216,8 @@ function update() {
       camera.position.set(playerPos.x, 512, playerPos.z)
       camera.lookAt(playerPos.x, 0, playerPos.z)
     } else if (cameraState.value === 'swivel') {
-      camera.position.set(playerPos.x, 512, playerPos.z)
+        camera.position.set(playerPos.x, 768, playerPos.z)
+
       camera.rotation.x = -Math.PI / 2
       camera.rotation.z = playerPos.angle
       camera.rotation.y = 0
