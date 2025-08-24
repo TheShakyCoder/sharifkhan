@@ -321,6 +321,14 @@ onUnmounted(() => {
             <span class="description">Fire Shell</span>
           </div>
         </div>
+
+        <div class="control-group">
+          <h3>[Dev Hours]</h3>
+          <div class="control-item">
+            <span class="key">up to 24/8/25</span>
+            <span class="description">10 hours</span>
+          </div>
+        </div>
       </div>
 
       <button @click="showControls = false" class="close-btn">
