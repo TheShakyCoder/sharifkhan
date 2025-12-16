@@ -28,10 +28,12 @@ defineProps({
                 <div>inertia.js</div>
                 <div>vue.js</div>
             </div>
+            <!--
             <div class="flex flex-col mt-12">
                 <h2 class="font-bold text-2xl">Concept Sites</h2>
                 <div><a class="underline underline-offset-4" href="https://dev.stupidly.uk">Stupidly</a> Bookkeeping App</div>
             </div>
+            -->
             <div class="flex flex-col mt-12">
                 <h2 class="font-bold text-2xl">Games</h2>
                 <div><a class="underline underline-offset-4" href="/dodge">Dodge</a> (first attempt)</div>
