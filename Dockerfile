@@ -40,15 +40,17 @@ RUN install-php-extensions pcntl pdo_mysql intl zip bcmath gd redis
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
-    # Standard Caddy/FrankenPHP server settings
     SERVER_NAME=:80
 
 WORKDIR /var/www/html
 
+# Copy composer binary from official image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 # 1. Copy source files first
 COPY . /var/www/html/
 
-# 2. Layer in build artifacts
+# 2. Layer in built artifacts (Vendor, Assets, SSR)
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
@@ -69,5 +71,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Run the PHP server using the public directory as root
-# This automatically handles Laravel's index.php routing
 CMD ["frankenphp", "php-server", "--root", "public/"]
