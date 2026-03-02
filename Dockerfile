@@ -13,26 +13,30 @@ RUN composer install \
 # Stage 2: Build Node dependencies and assets
 FROM node:20-alpine AS node-builder
 WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
 
-# Vite build needs the 'vendor' folder to resolve Ziggy routes
+# Define ARGs for Vite to use during build (Coolify passes these automatically)
+ARG VITE_APP_NAME
+ARG VITE_PUSHER_APP_KEY
+ARG VITE_PUSHER_HOST
+ARG VITE_PUSHER_PORT
+ARG VITE_PUSHER_SCHEME
+ARG VITE_PUSHER_APP_CLUSTER
+
+COPY package.json package-lock.json ./
+# Vite needs 'vendor' to resolve Ziggy routes
 COPY --from=php-builder /app/vendor /app/vendor
 COPY . .
-RUN npm run build
+
+# Explicitly running the requested command
+RUN npm ci && npm run build
 
 # Stage 3: Final Runtime
 FROM dunglas/frankenphp:1-php8.3-alpine
 LABEL maintainer="Antigravity"
 
-# Install runtime dependencies
 RUN apk add --no-cache bash netcat-openbsd nodejs npm
+RUN install-php-extensions pcntl pdo_mysql intl zip bcmath gd redis
 
-# Install PHP extensions
-RUN install-php-extensions pcntl pdo_mysql intl zip bcmath
-RUN install-php-extensions gd redis
-
-# Set production environment variables
 ENV APP_ENV=production \
     APP_DEBUG=false \
     LOG_CHANNEL=stderr \
@@ -40,15 +44,16 @@ ENV APP_ENV=production \
 
 WORKDIR /var/www/html
 
-# Copy binary and artifacts
+# Copy binary and all source files
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+COPY . /var/www/html/
+
+# Restore production-ready artifacts (Vendor, Build, SSR)
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
-COPY . /var/www/html/
 
-# Permissions and Autoload optimization
-# We clear bootstrap/cache before dump-autoload to avoid Sail/dev dependency errors
+# Final cleanup and optimization
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs \
     && rm -f bootstrap/cache/*.php \
     && chmod -R 777 storage bootstrap/cache \
