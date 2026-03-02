@@ -1,5 +1,5 @@
 # Stage 1: Build PHP dependencies
-FROM composer:2 as php-builder
+FROM composer:2 AS php-builder
 WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install \
@@ -10,10 +10,13 @@ RUN composer install \
     --prefer-dist
 
 # Stage 2: Build Node dependencies and assets
-FROM node:20-alpine as node-builder
+FROM node:20-alpine AS node-builder
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
+
+# Vite build needs the 'vendor' folder to resolve Ziggy routes (imported in app.js)
+COPY --from=php-builder /app/vendor /app/vendor
 COPY . .
 RUN npm run build
 
@@ -25,7 +28,6 @@ LABEL maintainer="Antigravity"
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Install necessary PHP extensions and runtime dependencies
-# These are the standard ones for Laravel apps
 RUN apk add --no-cache \
     libpng-dev \
     libjpeg-turbo-dev \
