@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+touch /var/www/html/database/database.sqlite
+
 # Run database migrations if APP_ENV is production and DB_AUTO_MIGRATE is true
 if [ "${APP_ENV}" == "production" ] && [ "${DB_AUTO_MIGRATE}" == "true" ]; then
     echo "Running migrations..."
