@@ -7,7 +7,8 @@ RUN composer install \
     --no-interaction \
     --no-plugins \
     --no-scripts \
-    --prefer-dist
+    --prefer-dist \
+    --no-dev
 
 # Stage 2: Build Node dependencies and assets
 FROM node:20-alpine AS node-builder
@@ -27,7 +28,7 @@ LABEL maintainer="Antigravity"
 # Install runtime dependencies
 RUN apk add --no-cache bash netcat-openbsd nodejs npm
 
-# Install PHP extensions (split for better caching/stability)
+# Install PHP extensions
 RUN install-php-extensions pcntl pdo_mysql intl zip bcmath
 RUN install-php-extensions gd redis
 
@@ -47,7 +48,9 @@ COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
 COPY . /var/www/html/
 
 # Permissions and Autoload optimization
+# We clear bootstrap/cache before dump-autoload to avoid Sail/dev dependency errors
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs \
+    && rm -f bootstrap/cache/*.php \
     && chmod -R 777 storage bootstrap/cache \
     && composer dump-autoload --optimize --no-dev --classmap-authoritative
 
