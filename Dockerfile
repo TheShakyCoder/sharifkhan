@@ -2,18 +2,11 @@
 FROM composer:2 AS php-builder
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install \
-    --ignore-platform-reqs \
-    --no-interaction \
-    --no-plugins \
-    --no-scripts \
-    --prefer-dist \
-    --no-dev
+RUN composer install --ignore-platform-reqs --no-interaction --no-plugins --no-scripts --prefer-dist --no-dev
 
-# Stage 2: Build Node dependencies and assets
+# Stage 2: Build Node assets
 FROM node:20-alpine AS node-builder
 WORKDIR /app
-
 ARG VITE_APP_NAME
 ARG VITE_PUSHER_APP_KEY
 ARG VITE_PUSHER_HOST
@@ -26,49 +19,59 @@ COPY --from=php-builder /app/vendor /app/vendor
 COPY . .
 RUN npm ci && npm run build
 
-# Stage 3: Final Runtime
-FROM dunglas/frankenphp:1-php8.3-alpine
+# Stage 3: Final Runtime (Classic Nginx + PHP-FPM)
+FROM php:8.3-fpm-alpine
 LABEL maintainer="Antigravity"
 
-# Install system dependencies
-RUN apk add --no-cache bash netcat-openbsd nodejs npm
+# Install system dependencies including Nginx and Supervisor
+RUN apk add --no-cache \
+    bash \
+    nginx \
+    supervisor \
+    nodejs \
+    npm \
+    netcat-openbsd \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
+    libzip-dev \
+    icu-dev
 
 # Install PHP extensions
-RUN install-php-extensions pcntl pdo_mysql intl zip bcmath gd redis
+RUN curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o /usr/local/bin/install-php-extensions && \
+    chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions pcntl pdo_mysql intl zip bcmath gd redis
 
-# Set production environment variables
-ENV APP_ENV=production \
-    APP_DEBUG=false \
-    LOG_CHANNEL=stderr \
-    SERVER_NAME=:80
+# Configure Nginx and Supervisor
+COPY .docker/nginx.conf /etc/nginx/http.d/default.conf
+COPY .docker/supervisor.conf /etc/supervisor/conf.d/laravel.conf
 
 WORKDIR /var/www/html
 
-# Copy composer binary from official image
+# Restore binary and source
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# 1. Copy source files first
 COPY . /var/www/html/
 
-# 2. Layer in built artifacts (Vendor, Assets, SSR)
+# Layer in built artifacts
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
 
-# 3. Clean up and optimize
+# Final cleanup, permissions, and optimization
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs \
     && rm -f bootstrap/cache/*.php \
-    && chmod -R 777 storage bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 storage bootstrap/cache \
     && php artisan config:clear \
     && php artisan route:clear \
     && composer dump-autoload --optimize --no-dev --classmap-authoritative
 
-EXPOSE 80 443 443/udp
+EXPOSE 80
 
 COPY .docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Run the PHP server using the public directory as root
-CMD ["frankenphp", "php-server", "--root", "public/"]
+# Start services via Supervisor
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel.conf"]
