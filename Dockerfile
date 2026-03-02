@@ -18,12 +18,14 @@ COPY package.json package-lock.json ./
 COPY --from=php-builder /app/vendor /app/vendor
 COPY . .
 RUN npm ci && npm run build
+# Prune node_modules to production only to save space
+RUN npm prune --production
 
-# Stage 3: Final Runtime (Classic Nginx + PHP-FPM)
+# Stage 3: Final Runtime
 FROM php:8.3-fpm-alpine
 LABEL maintainer="Antigravity"
 
-# Install system dependencies including Nginx and Supervisor
+# Install system dependencies
 RUN apk add --no-cache \
     bash \
     nginx \
@@ -54,6 +56,7 @@ COPY . /var/www/html/
 
 # Layer in built artifacts
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
+COPY --from=node-builder /app/node_modules/ /var/www/html/node_modules/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
 
@@ -74,4 +77,5 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Start services via Supervisor
+# Pointing to the specific config file
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel.conf"]
