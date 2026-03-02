@@ -15,7 +15,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-# Vite build needs the 'vendor' folder to resolve Ziggy routes (imported in app.js)
+# Vite build needs the 'vendor' folder to resolve Ziggy routes
 COPY --from=php-builder /app/vendor /app/vendor
 COPY . .
 RUN npm run build
@@ -24,62 +24,37 @@ RUN npm run build
 FROM dunglas/frankenphp:1-php8.3-alpine
 LABEL maintainer="Antigravity"
 
-# Copy composer binary for runtime optimizations
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Install runtime dependencies
+RUN apk add --no-cache bash netcat-openbsd nodejs npm
 
-# Install necessary PHP extensions and runtime dependencies
-RUN apk add --no-cache \
-    libpng-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libzip-dev \
-    icu-dev \
-    nodejs \
-    npm \
-    bash \
-    netcat-openbsd
-
-RUN install-php-extensions \
-    pcntl \
-    pdo_mysql \
-    pdo_sqlite \
-    gd \
-    intl \
-    zip \
-    opcache \
-    bcmath \
-    redis
+# Install PHP extensions (split for better caching/stability)
+RUN install-php-extensions pcntl pdo_mysql intl zip bcmath
+RUN install-php-extensions gd redis
 
 # Set production environment variables
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV LOG_CHANNEL=stderr
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    FRANKENPHP_CONFIG="worker ./public/index.php"
 
 WORKDIR /var/www/html
 
-# Copy application files
+# Copy binary and artifacts
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
 COPY . /var/www/html/
 
-# Ensure necessary folders exist and permissions are correct
-RUN mkdir -p storage/framework/{sessions,views,cache} \
-    && mkdir -p storage/logs \
-    && chmod -R 777 storage bootstrap/cache
+# Permissions and Autoload optimization
+RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs \
+    && chmod -R 777 storage bootstrap/cache \
+    && composer dump-autoload --optimize --no-dev --classmap-authoritative
 
-# Re-run composer dump-autoload for optimization
-RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
-
-# Expose ports for HTTP, HTTPS, and HTTP/3
 EXPOSE 80 443 443/udp
 
-# Custom Entrypoint to handle migrations and potential SSR
 COPY .docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-
-# Start FrankenPHP in worker mode
 CMD ["frankenphp", "run-worker", "--config", "/var/www/html/public/index.php"]
