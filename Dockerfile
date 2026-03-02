@@ -30,29 +30,30 @@ RUN npm ci && npm run build
 FROM dunglas/frankenphp:1-php8.3-alpine
 LABEL maintainer="Antigravity"
 
+# Install system dependencies
 RUN apk add --no-cache bash netcat-openbsd nodejs npm
+
+# Install PHP extensions
 RUN install-php-extensions pcntl pdo_mysql intl zip bcmath gd redis
 
-# Set the document root for FrankenPHP to Laravel's public directory
-ENV FRANKENPHP_CONFIG="import /etc/caddy/Caddyfile.d/*.conf"
-ENV SERVER_NAME=:80
-
+# Set production environment variables
 ENV APP_ENV=production \
     APP_DEBUG=false \
-    LOG_CHANNEL=stderr
+    LOG_CHANNEL=stderr \
+    # Standard Caddy/FrankenPHP server settings
+    SERVER_NAME=:80
 
 WORKDIR /var/www/html
 
-# Copy binary and source
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# 1. Copy source files first
 COPY . /var/www/html/
 
-# Restore production artifacts
+# 2. Layer in build artifacts
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
 
-# Final cleanup and optimization (Clearing cache is critical to avoid 404/service errors)
+# 3. Clean up and optimize
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs \
     && rm -f bootstrap/cache/*.php \
     && chmod -R 777 storage bootstrap/cache \
@@ -67,5 +68,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-# Use php-server mode with the root set to public/
+# Run the PHP server using the public directory as root
+# This automatically handles Laravel's index.php routing
 CMD ["frankenphp", "php-server", "--root", "public/"]
