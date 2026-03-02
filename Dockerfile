@@ -15,11 +15,11 @@ ARG VITE_PUSHER_SCHEME
 ARG VITE_PUSHER_APP_CLUSTER
 
 COPY package.json package-lock.json ./
+# Vite needs 'vendor' to resolve Ziggy routes
 COPY --from=php-builder /app/vendor /app/vendor
 COPY . .
+# We don't use --production here because SSR needs several 'devDependencies' at runtime
 RUN npm ci && npm run build
-# Prune node_modules to production only to save space
-RUN npm prune --production
 
 # Stage 3: Final Runtime
 FROM php:8.3-fpm-alpine
@@ -56,12 +56,13 @@ COPY . /var/www/html/
 
 # Layer in built artifacts
 COPY --from=php-builder /app/vendor/ /var/www/html/vendor/
+# IMPORTANT: Copy node_modules WITHOUT pruning, as Inertia SSR requires many devDeps like @inertiajs/vue3
 COPY --from=node-builder /app/node_modules/ /var/www/html/node_modules/
 COPY --from=node-builder /app/public/build/ /var/www/html/public/build/
 COPY --from=node-builder /app/bootstrap/ssr/ /var/www/html/bootstrap/ssr/
 
 # Final cleanup, permissions, and optimization
-RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs \
+RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs database \
     && rm -f bootstrap/cache/*.php \
     && chown -R www-data:www-data /var/www/html \
     && chmod -R 775 storage bootstrap/cache \
@@ -77,5 +78,4 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # Start services via Supervisor
-# Pointing to the specific config file
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/laravel.conf"]
