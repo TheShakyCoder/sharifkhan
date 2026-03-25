@@ -1,0 +1,21 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DodgeGame from '../../components/projects/Dodge/Index.vue';
+---
+
+<Layout title="Dodge Game | Sharif Khan">
+	<main class="w-screen h-screen overflow-hidden bg-black">
+		<DodgeGame client:only="vue" />
+	</main>
+</Layout>
+
+<style is:global>
+	/* Ensure the game takes up the full screen and handles overflow */
+	body, html {
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+	}
+</style>

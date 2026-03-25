@@ -1,11 +1,51 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Hero from '../components/cv/Hero.svelte';
+import LookingFor from '../components/cv/LookingFor.svelte';
+import Section from '../components/cv/Section.svelte';
+import Experience from '../components/cv/Experience.svelte';
+import Skills from '../components/cv/Skills.svelte';
+import Projects from '../components/cv/Projects.svelte';
+import References from '../components/cv/References.svelte';
+import Hobbies from '../components/cv/Hobbies.svelte';
+import Links from '../components/cv/Links.svelte';
+import { cvData } from '../data/cvData';
 ---
 
-<Layout>
-	<Welcome />
+<Layout title={`${cvData.personalInfo.name} | CV`}>
+	<main>
+		<Hero {...cvData.personalInfo} client:load />
+
+		<div class="container mx-auto px-6 py-8">
+			<LookingFor {...cvData.lookingFor} client:visible />
+		</div>
+		
+		<Section title="Employment History" id="experience">
+			<Experience items={cvData.employmentHistory} client:visible />
+		</Section>
+
+		<Section title="Skillsets" id="skills">
+			<Skills categories={cvData.skillsets} client:visible />
+		</Section>
+
+		<Section title="Projects" id="projects">
+			<Projects items={cvData.projects} client:visible />
+		</Section>
+
+		<Section title="References" id="references">
+			<References items={cvData.references} client:visible />
+		</Section>
+
+		<Section title="Hobbies" id="hobbies">
+			<Hobbies items={cvData.hobbies} client:visible />
+		</Section>
+
+		<Section title="Links" id="links">
+			<Links items={cvData.links} client:visible />
+		</Section>
+
+		<footer class="py-12 border-t border-white/10 text-center text-gray-500 text-sm">
+			<p>&copy; {new Date().getFullYear()} {cvData.personalInfo.name}. Built with Astro & Tailwind CSS.</p>
+		</footer>
+	</main>
 </Layout>
