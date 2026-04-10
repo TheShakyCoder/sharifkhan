@@ -95,10 +95,17 @@ export const cvData = {
     },
     {
       name: "BackWhen",
-      description: "Update of Dodge",
+      description: "Private video sharif for friends and family. Built with Laravel and Vue.js, it allows users to upload, share, and view videos in a secure environment.",
       tech: ["Vue.js", "Laravel", "ffmpeg", "Reverb"],
       link: "https://backwhen.co.uk",
       image: "https://api.dicebear.com/7.x/shapes/svg?seed=backwhen"
+    },
+    {
+      name: "Coders Hot Sauce",
+      description: "A personal project where I create and sell my own hot sauce for pizza. Built with Laravel and Vue.js, it allows users to buy bottles of hot sauce.",
+      tech: ["Vue.js", "Laravel", "Tailwind CSS"],
+      link: "https://codershotsauce.co.uk",
+      image: "https://api.dicebear.com/7.x/shapes/svg?seed=hotsauce"
     }
   ]
 };
